@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server"
 import { createAdminClient, createClient } from "@/lib/supabase/server"
+import sgMail from "@sendgrid/mail"
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY || "")
 
 export async function POST(request: Request) {
   try {
-    const supabase = createClient()
-    const adminSupabase = createAdminClient()
+    const supabase = await createClient()
+    const adminSupabase = await createAdminClient()
 
     const {
       data: { user: authUser },
@@ -15,7 +18,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user is admin
     const { data: adminData, error: adminCheckError } = await supabase
       .from("users")
       .select("role")
@@ -29,8 +31,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { email, password, firstName, lastName, phone } = body
 
-    // Generate campus ID for sub-admin
-    const campusId = `SUB-${Date.now()}`
+    const campusId = `ADM-${Date.now().toString().slice(-8)}`
 
     console.log("[v0] Creating sub-admin with email:", email)
 
@@ -55,14 +56,13 @@ export async function POST(request: Request) {
 
     console.log("[v0] Sub-admin auth user created:", newUser.user?.id)
 
-    // Wait for trigger to create user profile
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
     const { error: updateError } = await adminSupabase
       .from("users")
       .update({
         created_by: authUser.id,
-        status: "approved", // Sub-admins are auto-approved
+        status: "approved",
       })
       .eq("id", newUser.user!.id)
 
@@ -79,6 +79,41 @@ export async function POST(request: Request) {
         campus_id: campusId,
       },
     })
+
+    try {
+      const msg = {
+        to: email,
+        from: process.env.SENDGRID_FROM_EMAIL || "noreply@campuseats.com",
+        subject: "Bienvenue sur CampusEats - Compte Administrateur",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #ef4444;">Bienvenue sur CampusEats, ${firstName} !</h1>
+            <p>Un compte administrateur a été créé pour vous par l'administrateur principal.</p>
+            <div style="background-color: #ffedd5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 0; font-weight: bold; color: #c2410c;">Vos identifiants :</p>
+              <p style="margin: 10px 0 0;"><strong>Email :</strong> ${email}</p>
+              <p style="margin: 5px 0 0;"><strong>CampusID :</strong> ${campusId}</p>
+              <p style="margin: 5px 0 0;"><strong>Mot de passe temporaire :</strong> ${password}</p>
+            </div>
+            <p><strong>Important :</strong></p>
+            <ul>
+              <li>Conservez précieusement ces identifiants</li>
+              <li>Changez votre mot de passe lors de votre première connexion</li>
+              <li>En tant qu'administrateur, vous pouvez gérer les utilisateurs et superviser la plateforme</li>
+            </ul>
+            <a href="${process.env.NEXT_PUBLIC_APP_URL}/login" style="display: inline-block; background-color: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px;">
+              Se connecter
+            </a>
+          </div>
+        `,
+      }
+
+      await sgMail.send(msg)
+      console.log("[v0] Email sent to sub-admin")
+    } catch (emailError) {
+      console.error("[v0] Error sending email:", emailError)
+      // Don't fail the request if email fails
+    }
 
     return NextResponse.json({
       success: true,

@@ -14,8 +14,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Plus, Trash2, CheckCircle2 } from 'lucide-react'
+import { Loader2, Plus, Trash2, CheckCircle2, Upload, X } from "lucide-react"
 import Image from "next/image"
+import { formatCFA } from "@/lib/utils/currency"
 
 export function MenuManagement() {
   const { userData } = useAuth()
@@ -32,6 +33,9 @@ export function MenuManagement() {
   const [formError, setFormError] = useState("")
   const [formSuccess, setFormSuccess] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string>("")
 
   useEffect(() => {
     fetchMenuItems()
@@ -87,6 +91,57 @@ export function MenuManagement() {
     }))
   }
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setFormError("Veuillez sélectionner une image")
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setFormError("L'image ne doit pas dépasser 5MB")
+      return
+    }
+
+    setSelectedFile(file)
+    setImagePreview(URL.createObjectURL(file))
+    setFormError("")
+  }
+
+  const uploadImage = async (): Promise<string> => {
+    if (!selectedFile) return formData.image || "/diverse-food-spread.png"
+
+    try {
+      setUploadingImage(true)
+      const supabase = createClient()
+      const fileExt = selectedFile.name.split(".").pop()
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`
+      const filePath = `menu/${userData?.uid}/${fileName}`
+
+      const { error: uploadError } = await supabase.storage.from("menu-images").upload(filePath, selectedFile, {
+        cacheControl: "3600",
+        upsert: false,
+      })
+
+      if (uploadError) throw uploadError
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("menu-images").getPublicUrl(filePath)
+
+      return publicUrl
+    } catch (error) {
+      console.error("[v0] Error uploading image:", error)
+      throw error
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormError("")
@@ -100,6 +155,11 @@ export function MenuManagement() {
     }
 
     try {
+      let imageUrl = formData.image || "/diverse-food-spread.png"
+      if (selectedFile) {
+        imageUrl = await uploadImage()
+      }
+
       const supabase = createClient()
 
       const { error } = await supabase.from("menu_items").insert({
@@ -108,7 +168,7 @@ export function MenuManagement() {
         description: formData.description || null,
         price: Number.parseFloat(formData.price),
         category: formData.category,
-        image: formData.image || "/diverse-food-spread.png",
+        image: imageUrl,
         is_available: true,
       })
 
@@ -122,6 +182,8 @@ export function MenuManagement() {
         category: "",
         image: "",
       })
+      setSelectedFile(null)
+      setImagePreview("")
       setShowAddForm(false)
       fetchMenuItems()
     } catch (error: any) {
@@ -135,10 +197,7 @@ export function MenuManagement() {
   const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
     try {
       const supabase = createClient()
-      const { error } = await supabase
-        .from("menu_items")
-        .update({ is_available: !currentStatus })
-        .eq("id", itemId)
+      const { error } = await supabase.from("menu_items").update({ is_available: !currentStatus }).eq("id", itemId)
 
       if (error) throw error
 
@@ -219,12 +278,12 @@ export function MenuManagement() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="price">Prix (€) *</Label>
+                  <Label htmlFor="price">Prix (FCFA) *</Label>
                   <Input
                     id="price"
                     name="price"
                     type="number"
-                    step="0.01"
+                    step="1"
                     min="0"
                     value={formData.price}
                     onChange={handleChange}
@@ -263,25 +322,50 @@ export function MenuManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image">URL de l'image</Label>
-                <Input
-                  id="image"
-                  name="image"
-                  type="url"
-                  value={formData.image}
-                  onChange={handleChange}
-                  placeholder="https://example.com/image.jpg"
-                  disabled={submitting}
-                />
-                <p className="text-xs text-muted-foreground">Laissez vide pour utiliser une image par défaut</p>
+                <Label htmlFor="image">Photo du plat</Label>
+                <div className="flex items-center gap-4">
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    disabled={submitting}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById("image")?.click()}
+                    disabled={submitting || uploadingImage}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Choisir une photo
+                  </Button>
+                  {imagePreview && (
+                    <div className="relative h-16 w-16 rounded overflow-hidden">
+                      <Image src={imagePreview || "/placeholder.svg"} alt="Aperçu" fill className="object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedFile(null)
+                          setImagePreview("")
+                        }}
+                        className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-bl"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">Formats acceptés: JPG, PNG, WebP. Taille max: 5MB</p>
               </div>
 
               <div className="flex gap-2">
-                <Button type="submit" disabled={submitting}>
-                  {submitting ? (
+                <Button type="submit" disabled={submitting || uploadingImage}>
+                  {submitting || uploadingImage ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Ajout...
+                      {uploadingImage ? "Upload..." : "Ajout..."}
                     </>
                   ) : (
                     <>
@@ -324,7 +408,7 @@ export function MenuManagement() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <p className="text-2xl font-bold text-primary">{item.price.toFixed(2)} €</p>
+                  <p className="text-2xl font-bold text-primary">{formatCFA(item.price)}</p>
                   <Badge variant="outline" className="capitalize">
                     {item.category}
                   </Badge>

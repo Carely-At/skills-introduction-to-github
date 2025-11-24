@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Package, Phone, MapPin } from 'lucide-react'
+import { Loader2, Package, Phone, MapPin } from "lucide-react"
+import { formatCFA } from "@/lib/utils/currency"
 
 export function VendorOrders() {
   const { userData } = useAuth()
@@ -24,7 +25,7 @@ export function VendorOrders() {
 
     try {
       const supabase = createClient()
-      
+
       const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
         .select(`
@@ -74,10 +75,7 @@ export function VendorOrders() {
   const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
     try {
       const supabase = createClient()
-      const { error } = await supabase
-        .from("orders")
-        .update({ status: newStatus })
-        .eq("id", orderId)
+      const { error } = await supabase.from("orders").update({ status: newStatus }).eq("id", orderId)
 
       if (error) throw error
 
@@ -174,7 +172,7 @@ export function VendorOrders() {
                         <span>
                           {item.quantity}x {item.name}
                         </span>
-                        <span className="font-medium">{(item.price * item.quantity).toFixed(2)} €</span>
+                        <span className="font-medium">{formatCFA(item.price * item.quantity)}</span>
                       </li>
                     ))}
                   </ul>
@@ -194,7 +192,7 @@ export function VendorOrders() {
 
                 <div className="flex items-center justify-between">
                   <div className="text-lg font-bold">
-                    Total : <span className="text-primary">{order.totalAmount.toFixed(2)} €</span>
+                    Total : <span className="text-primary">{formatCFA(order.totalAmount)}</span>
                   </div>
 
                   {order.status !== "cancelled" && order.status !== "delivered" && (

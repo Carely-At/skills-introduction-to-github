@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, Package, CheckCircle } from "lucide-react"
+import { formatCFA } from "@/lib/utils/currency"
 
 export function DeliveryHistory() {
   const { userData } = useAuth()
@@ -85,7 +86,7 @@ export function DeliveryHistory() {
           <Card>
             <CardHeader>
               <CardDescription>Gains estimés</CardDescription>
-              <CardTitle className="text-3xl text-primary">{stats.earnings.toFixed(2)} €</CardTitle>
+              <CardTitle className="text-3xl text-primary">{formatCFA(stats.earnings)}</CardTitle>
             </CardHeader>
           </Card>
         </div>
@@ -137,7 +138,7 @@ export function DeliveryHistory() {
 
                   <div className="flex justify-between">
                     <span className="font-semibold">Montant</span>
-                    <span className="text-lg font-bold text-primary">{order.totalAmount.toFixed(2)} €</span>
+                    <span className="text-lg font-bold text-primary">{formatCFA(order.totalAmount)}</span>
                   </div>
                 </div>
               </CardContent>

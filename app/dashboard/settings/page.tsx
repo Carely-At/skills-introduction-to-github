@@ -25,11 +25,28 @@ export default async function SettingsPage() {
     redirect("/login")
   }
 
+  const getDashboardRoute = (role: string) => {
+    switch (role) {
+      case "admin":
+      case "sub-admin":
+        return "/dashboard/admin"
+      case "vendor":
+        return "/dashboard/vendor"
+      case "delivery":
+        return "/dashboard/delivery"
+      case "client":
+      default:
+        return "/dashboard"
+    }
+  }
+
+  const dashboardRoute = getDashboardRoute(userData.role)
+
   return (
     <div className="container-responsive py-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <Link href="/dashboard" className="inline-block mb-4">
+          <Link href={dashboardRoute} className="inline-block mb-4">
             <Button variant="ghost" size="sm" className="-ml-2">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Retour au tableau de bord

@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { ShoppingBag, Trash2, Plus, Minus, CheckCircle2 } from 'lucide-react'
+import { ShoppingBag, Trash2, Plus, Minus, CheckCircle2 } from "lucide-react"
 import Image from "next/image"
+import { formatCFA } from "@/lib/utils/currency"
 
 interface CartItem {
   id: string
@@ -59,7 +60,7 @@ export function Cart({ items, onUpdateQuantity, onRemove, onClearCart }: CartPro
           acc[item.vendorId].push(item)
           return acc
         },
-        {} as Record<string, CartItem[]>
+        {} as Record<string, CartItem[]>,
       )
 
       for (const [vendorId, vendorItems] of Object.entries(itemsByVendor)) {
@@ -171,7 +172,7 @@ export function Cart({ items, onUpdateQuantity, onRemove, onClearCart }: CartPro
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h3 className="font-semibold">{item.name}</h3>
-                      <p className="text-sm text-primary font-medium">{item.price.toFixed(2)} €</p>
+                      <p className="text-sm text-primary font-medium">{formatCFA(item.price)}</p>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => onRemove(item.id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
@@ -186,7 +187,7 @@ export function Cart({ items, onUpdateQuantity, onRemove, onClearCart }: CartPro
                     <Button variant="outline" size="sm" onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}>
                       <Plus className="h-3 w-3" />
                     </Button>
-                    <span className="ml-auto font-semibold">{(item.price * item.quantity).toFixed(2)} €</span>
+                    <span className="ml-auto font-semibold">{formatCFA(item.price * item.quantity)}</span>
                   </div>
                 </div>
               </div>
@@ -230,7 +231,7 @@ export function Cart({ items, onUpdateQuantity, onRemove, onClearCart }: CartPro
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Sous-total</span>
-                <span>{total.toFixed(2)} €</span>
+                <span>{formatCFA(total)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Frais de livraison</span>
@@ -239,7 +240,7 @@ export function Cart({ items, onUpdateQuantity, onRemove, onClearCart }: CartPro
               <Separator />
               <div className="flex justify-between text-lg font-bold">
                 <span>Total</span>
-                <span className="text-primary">{total.toFixed(2)} €</span>
+                <span className="text-primary">{formatCFA(total)}</span>
               </div>
             </div>
           </CardContent>

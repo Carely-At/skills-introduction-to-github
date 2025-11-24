@@ -7,7 +7,8 @@ import type { Order, OrderStatus } from "@/lib/types/order"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Loader2, Package, Clock } from 'lucide-react'
+import { Loader2, Package, Clock } from "lucide-react"
+import { formatCFA } from "@/lib/utils/currency"
 
 export function OrderHistory() {
   const { userData } = useAuth()
@@ -20,7 +21,7 @@ export function OrderHistory() {
 
       try {
         const supabase = createClient()
-        
+
         const { data: ordersData, error: ordersError } = await supabase
           .from("orders")
           .select(`
@@ -138,7 +139,7 @@ export function OrderHistory() {
                         <span>
                           {item.quantity}x {item.name}
                         </span>
-                        <span className="font-medium">{(item.price * item.quantity).toFixed(2)} €</span>
+                        <span className="font-medium">{formatCFA(item.price * item.quantity)}</span>
                       </li>
                     ))}
                   </ul>
@@ -148,7 +149,7 @@ export function OrderHistory() {
 
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Total</span>
-                  <span className="text-lg font-bold text-primary">{order.totalAmount.toFixed(2)} €</span>
+                  <span className="text-lg font-bold text-primary">{formatCFA(order.totalAmount)}</span>
                 </div>
 
                 {order.deliveryAddress && (

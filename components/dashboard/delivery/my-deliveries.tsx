@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, Package, MapPin, Phone, CheckCircle, Navigation } from "lucide-react"
+import { formatCFA } from "@/lib/utils/currency"
 
 export function MyDeliveries() {
   const { userData } = useAuth()
@@ -163,7 +164,7 @@ export function MyDeliveries() {
                         <span>
                           {item.quantity}x {item.name}
                         </span>
-                        <span className="font-medium">{(item.price * item.quantity).toFixed(2)} €</span>
+                        <span className="font-medium">{formatCFA(item.price * item.quantity)}</span>
                       </li>
                     ))}
                   </ul>
@@ -185,7 +186,7 @@ export function MyDeliveries() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">Total</span>
-                    <span className="text-lg font-bold text-primary">{order.totalAmount.toFixed(2)} €</span>
+                    <span className="text-lg font-bold text-primary">{formatCFA(order.totalAmount)}</span>
                   </div>
 
                   <Button className="w-full" size="lg" onClick={() => completeDelivery(order.id)}>

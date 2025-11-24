@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Loader2, Plus, Store } from "lucide-react"
 import Image from "next/image"
+import { formatCFA } from "@/lib/utils/currency"
 
 interface MenuBrowserProps {
   searchQuery: string
@@ -138,7 +139,7 @@ export function MenuBrowser({ searchQuery, onAddToCart }: MenuBrowserProps) {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-2xl font-bold text-primary">{item.price.toFixed(2)} €</p>
+                <p className="text-2xl font-bold text-primary">{formatCFA(item.price)}</p>
               </CardContent>
               <CardFooter>
                 <Button className="w-full" onClick={() => onAddToCart(item)}>
