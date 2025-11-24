@@ -132,6 +132,15 @@ export function ClientDashboard() {
                 <span className="hidden xl:inline ml-2">Déconnexion</span>
               </Button>
             </div>
+            {/* Added mobile menu controls */}
+            <div className="sm:hidden flex items-center justify-end gap-2 mt-2">
+              <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard/settings")}>
+                <User className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
