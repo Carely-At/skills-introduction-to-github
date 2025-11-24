@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,13 +11,47 @@ import { useRouter } from "next/navigation"
 import { CreateUserForm } from "./create-user-form"
 import { UsersList } from "./users-list"
 import { VendorApprovalList } from "./vendor-approval-list"
+import { createClient } from "@/lib/supabase/client"
 
 export function AdminDashboard() {
   const { userData } = useAuth()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("create")
+  const [userCounts, setUserCounts] = useState({
+    vendors: 0,
+    delivery: 0,
+    clients: 0,
+  })
 
   console.log("[v0] AdminDashboard rendering, userData:", userData)
+
+  const fetchUserCounts = async () => {
+    try {
+      const supabase = createClient()
+
+      const { data: users, error } = await supabase.from("users").select("role")
+
+      if (error) {
+        console.error("[v0] Error fetching user counts:", error)
+        return
+      }
+
+      const counts = {
+        vendors: users?.filter((u) => u.role === "vendor").length || 0,
+        delivery: users?.filter((u) => u.role === "delivery").length || 0,
+        clients: users?.filter((u) => u.role === "client").length || 0,
+      }
+
+      console.log("[v0] User counts:", counts)
+      setUserCounts(counts)
+    } catch (error) {
+      console.error("[v0] Error fetching user counts:", error)
+    }
+  }
+
+  useEffect(() => {
+    fetchUserCounts()
+  }, [activeTab])
 
   const handleSignOut = async () => {
     console.log("[v0] Admin signing out")
@@ -90,7 +124,7 @@ export function AdminDashboard() {
               <Store className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{userCounts.vendors}</div>
               <p className="text-xs text-muted-foreground">Actifs sur la plateforme</p>
             </CardContent>
           </Card>
@@ -101,7 +135,7 @@ export function AdminDashboard() {
               <Truck className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{userCounts.delivery}</div>
               <p className="text-xs text-muted-foreground">Disponibles</p>
             </CardContent>
           </Card>
@@ -112,7 +146,7 @@ export function AdminDashboard() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{userCounts.clients}</div>
               <p className="text-xs text-muted-foreground">Inscrits</p>
             </CardContent>
           </Card>
@@ -157,7 +191,7 @@ export function AdminDashboard() {
               </TabsContent>
 
               <TabsContent value="users" className="mt-4 sm:mt-6">
-                <UsersList />
+                <UsersList onUserDeleted={fetchUserCounts} />
               </TabsContent>
 
               <TabsContent value="approvals" className="mt-4 sm:mt-6">

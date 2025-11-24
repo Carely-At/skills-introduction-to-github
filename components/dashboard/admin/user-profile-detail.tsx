@@ -24,6 +24,7 @@ interface UserWithDetails extends User {
     vehicleType: string
     isAvailable: boolean
   }
+  profilePhoto?: string
 }
 
 export default function UserProfileDetail({ userId }: { userId: string }) {
@@ -104,6 +105,7 @@ export default function UserProfileDetail({ userId }: { userId: string }) {
               isAvailable: userData.delivery_profiles[0].is_available,
             }
           : undefined,
+        profilePhoto: userData.profile_photo,
       }
 
       setUser(formattedUser)
@@ -306,9 +308,19 @@ export default function UserProfileDetail({ userId }: { userId: string }) {
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <Avatar className="h-20 w-20">
-              <AvatarFallback className="text-2xl bg-blue-600 text-white">{initials}</AvatarFallback>
-            </Avatar>
+            {user.profilePhoto ? (
+              <Avatar className="h-20 w-20 border-4 border-background shadow-sm">
+                <img
+                  src={user.profilePhoto || "/placeholder.svg"}
+                  alt={`${user.firstName} ${user.lastName}`}
+                  className="h-full w-full object-cover"
+                />
+              </Avatar>
+            ) : (
+              <Avatar className="h-20 w-20 border-4 border-background shadow-sm">
+                <AvatarFallback className="text-2xl bg-blue-600 text-white">{initials}</AvatarFallback>
+              </Avatar>
+            )}
             <div className="flex-1 space-y-2">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                 <CardTitle className="text-2xl">

@@ -21,7 +21,11 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
 
-export function UsersList() {
+interface UsersListProps {
+  onUserDeleted?: () => void
+}
+
+export function UsersList({ onUserDeleted }: UsersListProps) {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
@@ -87,6 +91,11 @@ export function UsersList() {
 
       // Remove user from local state
       setUsers((prev) => prev.filter((u) => u.uid !== user.uid))
+
+      // Call the callback function if provided
+      if (onUserDeleted) {
+        onUserDeleted()
+      }
 
       toast({
         title: "Utilisateur supprimé",
