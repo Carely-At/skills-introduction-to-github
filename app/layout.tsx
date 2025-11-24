@@ -1,6 +1,6 @@
 import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from 'next/font/google'
+import type { Metadata, Viewport } from "next"
+import { Inter } from "next/font/google"
 import "./globals.css"
 
 const inter = Inter({
@@ -8,9 +8,26 @@ const inter = Inter({
   variable: "--font-sans",
 })
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#3b82f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#1e40af" },
+  ],
+}
+
 export const metadata: Metadata = {
   title: "CampusEats - Livraison de repas universitaire",
   description: "Plateforme de livraison de repas pour les campus universitaires",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "CampusEats",
+  },
     generator: 'v0.app'
 }
 
@@ -21,12 +38,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <head>
-        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-      </head>
       <body className={`${inter.variable} font-sans antialiased`}>{children}</body>
     </html>
   )

@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import Link from "next/link"
 import type { User } from "@/lib/types/user"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Loader2, Mail, Phone, Award as IdCard, Trash2 } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Loader2, Mail, Phone, Award as IdCard, Trash2, Eye } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -135,47 +137,42 @@ export function UsersList() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nom</TableHead>
-              <TableHead>CampusID</TableHead>
-              <TableHead>Rôle</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.uid}>
-                <TableCell className="font-medium">
-                  {user.firstName} {user.lastName}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1">
-                    <IdCard className="h-3 w-3 text-muted-foreground" />
-                    <code className="text-xs">{user.campusId}</code>
-                  </div>
-                </TableCell>
-                <TableCell>{getRoleBadge(user.role)}</TableCell>
-                <TableCell>
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <Mail className="h-3 w-3" />
-                      {user.email}
-                    </div>
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <Phone className="h-3 w-3" />
-                      {user.phone}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={user.isActive ? "default" : "secondary"}>{user.isActive ? "Actif" : "Inactif"}</Badge>
-                </TableCell>
-                <TableCell className="text-right">
+      <div className="grid grid-cols-1 gap-4 lg:hidden">
+        {users.map((user) => (
+          <Card key={user.uid}>
+            <CardHeader>
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-base truncate">
+                    {user.firstName} {user.lastName}
+                  </CardTitle>
+                  <CardDescription className="flex items-center gap-1 mt-1">
+                    <IdCard className="h-3 w-3 flex-shrink-0" />
+                    <code className="text-xs truncate">{user.campusId}</code>
+                  </CardDescription>
+                </div>
+                {getRoleBadge(user.role)}
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <span className="truncate">{user.email}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <span>{user.phone}</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t">
+                <Badge variant={user.isActive ? "default" : "secondary"}>{user.isActive ? "Actif" : "Inactif"}</Badge>
+                <div className="flex gap-2">
+                  <Link href={`/dashboard/admin/users/${user.uid}`}>
+                    <Button variant="outline" size="sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </Link>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -185,17 +182,89 @@ export function UsersList() {
                     {deletingUserId === user.uid ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <>
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Supprimer
-                      </>
+                      <Trash2 className="h-4 w-4 text-destructive" />
                     )}
                   </Button>
-                </TableCell>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="hidden lg:block overflow-x-auto">
+        <div className="rounded-md border min-w-[800px]">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nom</TableHead>
+                <TableHead>CampusID</TableHead>
+                <TableHead>Rôle</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.uid}>
+                  <TableCell className="font-medium">
+                    {user.firstName} {user.lastName}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <IdCard className="h-3 w-3 text-muted-foreground" />
+                      <code className="text-xs">{user.campusId}</code>
+                    </div>
+                  </TableCell>
+                  <TableCell>{getRoleBadge(user.role)}</TableCell>
+                  <TableCell>
+                    <div className="space-y-1 text-xs max-w-[200px]">
+                      <div className="flex items-center gap-1 text-muted-foreground truncate">
+                        <Mail className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{user.email}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <Phone className="h-3 w-3 flex-shrink-0" />
+                        {user.phone}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={user.isActive ? "default" : "secondary"}>
+                      {user.isActive ? "Actif" : "Inactif"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Link href={`/dashboard/admin/users/${user.uid}`}>
+                        <Button variant="outline" size="sm">
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setUserToDelete(user)}
+                        disabled={deletingUserId === user.uid}
+                      >
+                        {deletingUserId === user.uid ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Supprimer
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>

@@ -5,9 +5,9 @@ import { useAuth } from "@/lib/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { UtensilsCrossed, LogOut, UserPlus, Users, Store, Truck } from 'lucide-react'
+import { UtensilsCrossed, LogOut, UserPlus, Users, Store, Truck } from "lucide-react"
 import { signOut } from "@/lib/supabase/auth"
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
 import { CreateUserForm } from "./create-user-form"
 import { UsersList } from "./users-list"
 import { VendorApprovalList } from "./vendor-approval-list"
@@ -36,40 +36,43 @@ export function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <UtensilsCrossed className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">CampusEats</span>
+      <header className="border-b border-border bg-card sticky top-0 z-50 safe-area-top">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <UtensilsCrossed className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
+                <span className="text-lg sm:text-2xl font-bold truncate">CampusEats</span>
+              </div>
+              <span className="text-xs sm:text-sm bg-primary text-primary-foreground px-2 sm:px-3 py-0.5 sm:py-1 rounded-full flex-shrink-0">
+                Admin
+              </span>
             </div>
-            <span className="text-sm bg-primary text-primary-foreground px-3 py-1 rounded-full">Admin</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm font-medium">
-                {userData?.firstName} {userData?.lastName}
-              </p>
-              <p className="text-xs text-muted-foreground">{userData?.campusId}</p>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-medium truncate max-w-[150px] lg:max-w-none">
+                  {userData?.firstName} {userData?.lastName}
+                </p>
+                <p className="text-xs text-muted-foreground">{userData?.campusId}</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={handleSignOut} className="touch-target bg-transparent">
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Déconnexion</span>
+              </Button>
             </div>
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Déconnexion
-            </Button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Tableau de bord administrateur</h1>
-          <p className="text-muted-foreground">Gérez les utilisateurs et supervisez la plateforme CampusEats</p>
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 safe-area-bottom">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Tableau de bord administrateur</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Gérez les utilisateurs et supervisez la plateforme CampusEats
+          </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Vendeurs</CardTitle>
@@ -92,7 +95,7 @@ export function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="sm:col-span-2 md:col-span-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Clients</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -104,38 +107,49 @@ export function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Management Tabs */}
         <Card>
           <CardHeader>
-            <CardTitle>Gestion des utilisateurs</CardTitle>
-            <CardDescription>Créez et gérez les comptes vendeurs et livreurs</CardDescription>
+            <CardTitle className="text-lg sm:text-xl">Gestion des utilisateurs</CardTitle>
+            <CardDescription className="text-sm">Créez et gérez les comptes vendeurs et livreurs</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-2 sm:px-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="create">
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Créer un utilisateur
+              <TabsList className="grid w-full grid-cols-3 h-auto">
+                <TabsTrigger
+                  value="create"
+                  className="text-xs sm:text-sm py-2 sm:py-2.5 flex-col sm:flex-row gap-1 sm:gap-2"
+                >
+                  <UserPlus className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Créer un utilisateur</span>
+                  <span className="sm:hidden">Créer</span>
                 </TabsTrigger>
-                <TabsTrigger value="users">
-                  <Users className="h-4 w-4 mr-2" />
-                  Liste des utilisateurs
+                <TabsTrigger
+                  value="users"
+                  className="text-xs sm:text-sm py-2 sm:py-2.5 flex-col sm:flex-row gap-1 sm:gap-2"
+                >
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Liste des utilisateurs</span>
+                  <span className="sm:hidden">Liste</span>
                 </TabsTrigger>
-                <TabsTrigger value="approvals">
-                  <Store className="h-4 w-4 mr-2" />
-                  Approbations
+                <TabsTrigger
+                  value="approvals"
+                  className="text-xs sm:text-sm py-2 sm:py-2.5 flex-col sm:flex-row gap-1 sm:gap-2"
+                >
+                  <Store className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Approbations</span>
+                  <span className="sm:hidden">Approb.</span>
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="create" className="space-y-4">
+              <TabsContent value="create" className="space-y-4 mt-4 sm:mt-6">
                 <CreateUserForm />
               </TabsContent>
 
-              <TabsContent value="users">
+              <TabsContent value="users" className="mt-4 sm:mt-6">
                 <UsersList />
               </TabsContent>
 
-              <TabsContent value="approvals">
+              <TabsContent value="approvals" className="mt-4 sm:mt-6">
                 <VendorApprovalList />
               </TabsContent>
             </Tabs>

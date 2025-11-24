@@ -1,4 +1,5 @@
-export type UserRole = "admin" | "vendor" | "delivery" | "client"
+export type UserRole = "admin" | "sub-admin" | "vendor" | "delivery" | "client"
+export type UserStatus = "pending" | "approved" | "rejected"
 
 export interface User {
   uid: string
@@ -11,6 +12,9 @@ export interface User {
   createdAt: Date
   updatedAt: Date
   isActive: boolean
+  createdBy?: string
+  approvedBy?: string
+  status: UserStatus
 }
 
 export interface VendorProfile extends User {
@@ -34,4 +38,15 @@ export interface ClientProfile extends User {
   role: "client"
   address?: string
   favoriteVendors: string[]
+}
+
+export interface AdminAction {
+  id: string
+  adminId: string
+  adminName: string
+  actionType: "create_user" | "approve_user" | "reject_user" | "delete_user" | "update_user" | "approve_images"
+  targetUserId?: string
+  targetUserName?: string
+  details?: Record<string, any>
+  createdAt: Date
 }

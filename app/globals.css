@@ -2,77 +2,85 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Modern food delivery color palette - deep blues, coral accents, sophisticated neutrals */
 @layer base {
   :root {
-    /* Modern food delivery color scheme */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Soft, calming color palette - Light mode */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Deep blue primary with modern appeal */
-    --primary: 221.2 83.2% 53.3%;
+    /* Soft blue-purple primary - calming and trustworthy */
+    --primary: 225 73% 65%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Light lavender secondary */
+    --secondary: 240 30% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 30% 95%;
+    --muted-foreground: 215 16% 47%;
 
-    /* Coral/Orange accent for warmth and appetite appeal */
-    --accent: 24.6 95% 53.1%;
-    --accent-foreground: 60 9.1% 97.8%;
+    /* Warm peach accent - welcoming and appetizing */
+    --accent: 20 95% 72%;
+    --accent-foreground: 222 47% 11%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    /* Soft success green */
+    --success: 142 71% 65%;
+    --success-foreground: 210 40% 98%;
 
-    --chart-1: 221.2 83.2% 53.3%;
-    --chart-2: 24.6 95% 53.1%;
-    --chart-3: 173 58% 39%;
-    --chart-4: 142 76% 36%;
-    --chart-5: 270 60% 70%;
+    --border: 220 30% 90%;
+    --input: 220 30% 92%;
+    --ring: 225 73% 65%;
 
-    --radius: 0.75rem;
+    --chart-1: 225 73% 65%;
+    --chart-2: 20 95% 72%;
+    --chart-3: 173 58% 65%;
+    --chart-4: 142 71% 65%;
+    --chart-5: 270 60% 75%;
+
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* Soft dark mode - less harsh blacks */
+    --background: 222 30% 8%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 222 30% 10%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 30% 10%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 225 73% 70%;
+    --primary-foreground: 222 30% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 240 20% 15%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 222 30% 15%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 24.6 95% 53.1%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --accent: 20 95% 72%;
+    --accent-foreground: 222 30% 8%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --success: 142 71% 60%;
+    --success-foreground: 222 30% 8%;
+
+    --border: 222 30% 18%;
+    --input: 222 30% 18%;
+    --ring: 225 73% 70%;
   }
 }
 
@@ -80,22 +88,60 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+    overscroll-behavior-y: contain;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smoother scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/30;
   }
 }
 
 @layer utilities {
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(221.2 83.2% 53.3%) 0%, hsl(221.2 83.2% 43.3%) 100%);
+    background: linear-gradient(135deg, hsl(225 73% 65%) 0%, hsl(225 73% 75%) 100%);
   }
 
   .gradient-accent {
-    background: linear-gradient(135deg, hsl(24.6 95% 53.1%) 0%, hsl(14.6 91% 53.1%) 100%);
+    background: linear-gradient(135deg, hsl(20 95% 72%) 0%, hsl(30 90% 75%) 100%);
+  }
+
+  .gradient-success {
+    background: linear-gradient(135deg, hsl(142 71% 65%) 0%, hsl(152 71% 70%) 100%);
   }
 
   .glass-morphism {
     @apply bg-card/80 backdrop-blur-xl border border-border/50;
+  }
+
+  /* Soft shadow variants */
+  .shadow-soft {
+    box-shadow: 0 2px 20px -2px hsl(var(--primary) / 0.08);
+  }
+
+  .shadow-soft-lg {
+    box-shadow: 0 8px 40px -4px hsl(var(--primary) / 0.12);
   }
 
   .text-balance {
@@ -104,5 +150,61 @@
 
   .text-pretty {
     text-wrap: pretty;
+  }
+
+  .container-responsive {
+    @apply w-full max-w-full px-4 sm:px-6 lg:px-8 mx-auto;
+  }
+
+  .grid-responsive {
+    @apply grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .flex-responsive {
+    @apply flex flex-col sm:flex-row gap-4;
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Smooth transitions for all interactive elements */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 16px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="search"] {
+    font-size: 16px;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  /* Smooth focus rings */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
