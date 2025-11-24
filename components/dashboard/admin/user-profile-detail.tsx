@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@/lib/types/user"
 import type { Order } from "@/lib/types/order"
 import { useAuth } from "@/lib/hooks/useAuth"
-import { canViewUser, getMaskedEmail } from "@/lib/utils/permissions"
+import { getMaskedEmail } from "@/lib/utils/permissions"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -70,8 +70,8 @@ export default function UserProfileDetail({ userId }: { userId: string }) {
         throw new Error("User not found")
       }
 
-      // Check permission to view this user
-      if (!canViewUser(currentUser?.role, userData.role)) {
+      // Only check for sub-admins trying to view admin/sub-admin accounts
+      if (currentUser?.role === "sub-admin" && ["admin", "sub-admin"].includes(userData.role)) {
         throw new Error("Insufficient permissions to view this user")
       }
 

@@ -112,6 +112,15 @@ export function ClientDashboard() {
                   </span>
                 )}
               </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push("/dashboard/settings")}
+                className="touch-target"
+              >
+                <User className="h-4 w-4 lg:mr-2" />
+                <span className="hidden lg:inline">Paramètres</span>
+              </Button>
               <div className="text-right hidden lg:block">
                 <p className="text-sm font-medium truncate max-w-[150px]">
                   {userData?.firstName} {userData?.lastName}
@@ -181,6 +190,15 @@ export function ClientDashboard() {
             <div className="max-w-2xl mx-auto">
               <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Mon profil</h2>
               <div className="bg-card p-4 sm:p-6 rounded-lg border border-border space-y-4">
+                <Button
+                  variant="outline"
+                  className="w-full touch-target mb-4 bg-transparent"
+                  onClick={() => router.push("/dashboard/settings")}
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Gérer ma photo de profil et paramètres
+                </Button>
+
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Nom complet</label>
                   <p className="text-base sm:text-lg">

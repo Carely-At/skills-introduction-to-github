@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { UtensilsCrossed, LogOut, UserPlus, Users, Store, Truck } from "lucide-react"
+import { UtensilsCrossed, LogOut, UserPlus, Users, Store, Truck, User } from "lucide-react"
 import { signOut } from "@/lib/supabase/auth"
 import { useRouter } from "next/navigation"
 import { CreateUserForm } from "./create-user-form"
@@ -49,16 +49,27 @@ export function AdminDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium truncate max-w-[150px] lg:max-w-none">
-                  {userData?.firstName} {userData?.lastName}
-                </p>
-                <p className="text-xs text-muted-foreground">{userData?.campusId}</p>
+              <div className="hidden sm:flex items-center gap-3 sm:gap-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => router.push("/dashboard/settings")}
+                  className="touch-target"
+                >
+                  <User className="h-4 w-4 lg:mr-2" />
+                  <span className="hidden lg:inline">Paramètres</span>
+                </Button>
+                <div className="text-right hidden lg:block">
+                  <p className="text-sm font-medium truncate max-w-[150px]">
+                    {userData?.firstName} {userData?.lastName}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{userData?.campusId}</p>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleSignOut} className="touch-target bg-transparent">
+                  <LogOut className="h-4 w-4 lg:mr-0" />
+                  <span className="hidden xl:inline ml-2">Déconnexion</span>
+                </Button>
               </div>
-              <Button variant="outline" size="sm" onClick={handleSignOut} className="touch-target bg-transparent">
-                <LogOut className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Déconnexion</span>
-              </Button>
             </div>
           </div>
         </div>

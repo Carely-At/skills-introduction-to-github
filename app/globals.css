@@ -116,9 +116,21 @@
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/30;
   }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  /* Smooth focus rings */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
 }
 
 @layer utilities {
+  /* Gradient utilities for modern UI */
   .gradient-primary {
     background: linear-gradient(135deg, hsl(225 73% 65%) 0%, hsl(225 73% 75%) 100%);
   }
@@ -131,11 +143,12 @@
     background: linear-gradient(135deg, hsl(142 71% 65%) 0%, hsl(152 71% 70%) 100%);
   }
 
+  /* Glass morphism effect */
   .glass-morphism {
     @apply bg-card/80 backdrop-blur-xl border border-border/50;
   }
 
-  /* Soft shadow variants */
+  /* Soft shadow variants for depth without harshness */
   .shadow-soft {
     box-shadow: 0 2px 20px -2px hsl(var(--primary) / 0.08);
   }
@@ -144,6 +157,7 @@
     box-shadow: 0 8px 40px -4px hsl(var(--primary) / 0.12);
   }
 
+  /* Text utilities for better readability */
   .text-balance {
     text-wrap: balance;
   }
@@ -152,6 +166,7 @@
     text-wrap: pretty;
   }
 
+  /* Responsive container utilities */
   .container-responsive {
     @apply w-full max-w-full px-4 sm:px-6 lg:px-8 mx-auto;
   }
@@ -164,6 +179,7 @@
     @apply flex flex-col sm:flex-row gap-4;
   }
 
+  /* Safe area utilities for mobile devices */
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -172,39 +188,30 @@
     padding-top: env(safe-area-inset-top);
   }
 
+  /* Touch target size for mobile accessibility - minimum 44x44px */
   .touch-target {
-    @apply min-h-[44px] min-w-[44px];
+    min-height: 44px;
+    min-width: 44px;
   }
 
-  /* Smooth transitions for all interactive elements */
+  /* Smooth transitions for interactive elements */
   .transition-smooth {
     @apply transition-all duration-300 ease-in-out;
   }
 }
 
+/* Mobile-specific optimizations */
 @media (max-width: 640px) {
   html {
-    font-size: 16px;
+    font-size: 16px; /* Prevent zoom on input focus on iOS */
   }
 
+  /* Prevent zoom on form inputs */
   input[type="text"],
   input[type="email"],
   input[type="tel"],
   input[type="password"],
   input[type="search"] {
     font-size: 16px;
-  }
-}
-
-@layer base {
-  html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    scroll-behavior: smooth;
-  }
-
-  /* Smooth focus rings */
-  *:focus-visible {
-    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }

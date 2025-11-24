@@ -5,6 +5,7 @@ import type { UserRole } from "@/lib/types/user"
 export const PERMISSIONS = {
   // User management
   VIEW_ALL_USERS: ["admin"],
+  VIEW_USER_PROFILE: ["admin", "sub-admin"],
   VIEW_NON_ADMIN_USERS: ["admin", "sub-admin"],
   CREATE_ADMIN: ["admin"],
   CREATE_SUB_ADMIN: ["admin"],
@@ -14,6 +15,7 @@ export const PERMISSIONS = {
   DELETE_USER: ["admin"],
   APPROVE_USER: ["admin"],
   REJECT_USER: ["admin"],
+  EDIT_USER_PROFILE: ["admin"],
 
   // Order management
   VIEW_ALL_ORDERS: ["admin", "sub-admin"],
@@ -49,10 +51,18 @@ export function canViewUser(adminRole: UserRole | undefined, targetRole: UserRol
   return false
 }
 
+export function canEditUser(adminRole: UserRole | undefined): boolean {
+  return adminRole === "admin"
+}
+
+export function canDeleteUser(adminRole: UserRole | undefined, targetRole: UserRole): boolean {
+  if (adminRole !== "admin") return false
+  return true
+}
+
 export function getMaskedEmail(email: string, userRole: UserRole | undefined): string {
   if (userRole === "admin") return email
 
-  // Sub-admins see masked emails
   const [local, domain] = email.split("@")
   if (!local || !domain) return email
 

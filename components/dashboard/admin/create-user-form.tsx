@@ -17,7 +17,7 @@ export function CreateUserForm() {
     firstName: "",
     lastName: "",
     phone: "",
-    role: "vendor" as "vendor" | "delivery",
+    role: "vendor" as "vendor" | "delivery" | "sub-admin",
     businessName: "",
     vehicleType: "",
   })
@@ -36,7 +36,7 @@ export function CreateUserForm() {
   const handleRoleChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      role: value as "vendor" | "delivery",
+      role: value as "vendor" | "delivery" | "sub-admin",
     }))
   }
 
@@ -105,6 +105,7 @@ export function CreateUserForm() {
             <SelectContent>
               <SelectItem value="vendor">Vendeur</SelectItem>
               <SelectItem value="delivery">Livreur</SelectItem>
+              <SelectItem value="sub-admin">Administrateur secondaire</SelectItem>
             </SelectContent>
           </Select>
         </div>

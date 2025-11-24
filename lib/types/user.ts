@@ -15,6 +15,7 @@ export interface User {
   createdBy?: string
   approvedBy?: string
   status: UserStatus
+  profilePhoto?: string
 }
 
 export interface VendorProfile extends User {
