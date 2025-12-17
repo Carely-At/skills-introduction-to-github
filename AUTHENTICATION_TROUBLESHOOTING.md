@@ -18,12 +18,12 @@
 #### A. Vérifier que le profil utilisateur existe
 
 Exécutez cette requête dans le SQL Editor de Supabase:
-\`\`\`sql
+```sql
 SELECT * FROM users WHERE email = 'votre-email@example.com';
-\`\`\`
+```
 
 Si aucun résultat, le trigger n'a pas créé le profil. Vérifiez:
-\`\`\`sql
+```sql
 -- Vérifier que le trigger existe
 SELECT * FROM pg_trigger WHERE tgname = 'on_auth_user_created';
 
@@ -32,18 +32,18 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
 
 -- Puis réexécuter le script 001_create_users_table.sql
-\`\`\`
+```
 
 #### B. Vérifier les politiques RLS
 
-\`\`\`sql
+```sql
 -- Voir toutes les politiques sur la table users
 SELECT * FROM pg_policies WHERE tablename = 'users';
 
 -- Tester l'accès direct
 SELECT auth.uid(); -- Devrait retourner votre user ID
 SELECT * FROM users WHERE id = auth.uid(); -- Devrait retourner votre profil
-\`\`\`
+```
 
 #### C. Vérifier les logs du navigateur
 
@@ -78,20 +78,20 @@ Si vous voyez `[v0] useAuth: No user data found in database`, le profil n'existe
 **Solutions:**
 1. Vérifier que les cookies sont autorisés
 2. Effacer les cookies et le localStorage:
-\`\`\`javascript
+```javascript
 // Dans la console du navigateur
 localStorage.clear();
 document.cookie.split(";").forEach(c => {
   document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
 });
 location.reload();
-\`\`\`
+```
 
 3. Vérifier le middleware dans la console:
-\`\`\`
+```
 [v0] Middleware: Checking auth for: /dashboard/admin
 [v0] Middleware: User authenticated: true
-\`\`\`
+```
 
 ### 4. Page dashboard se charge mais les données ne s'affichent pas
 
@@ -102,7 +102,7 @@ location.reload();
 **Solutions:**
 1. Vérifier les logs de la console pour les erreurs
 2. Tester les requêtes manuellement:
-\`\`\`javascript
+```javascript
 // Dans la console
 const { createClient } = await import('./lib/supabase/client');
 const supabase = createClient();
@@ -110,13 +110,13 @@ const supabase = createClient();
 // Tester l'accès aux données
 const { data, error } = await supabase.from('menu_items').select('*');
 console.log('Data:', data, 'Error:', error);
-\`\`\`
+```
 
 3. Vérifier les politiques RLS pour chaque table:
-\`\`\`sql
+```sql
 -- Exemple pour menu_items
 SELECT * FROM pg_policies WHERE tablename = 'menu_items';
-\`\`\`
+```
 
 ## Debugging Avancé
 
@@ -128,7 +128,7 @@ Les logs `[v0]` sont déjà activés dans le code. Pour voir tous les logs:
 2. Filtrez par `[v0]` pour ne voir que les logs de l'application
 3. Suivez le flux d'authentification:
 
-\`\`\`
+```
 [v0] Login form submitted
 [v0] Sign in attempt with identifier: admin@example.com
 [v0] Attempting Supabase sign in with email...
@@ -141,11 +141,11 @@ Les logs `[v0]` sont déjà activés dans le code. Pour voir tous les logs:
 [v0] useAuth: User data fetched successfully, role: admin
 [v0] ProtectedRoute: Access granted for role admin
 [v0] AdminDashboard rendering, userData: {...}
-\`\`\`
+```
 
 ### Tester l'authentification manuellement
 
-\`\`\`javascript
+```javascript
 // Dans la console du navigateur
 const { createClient } = await import('./lib/supabase/client');
 const supabase = createClient();
@@ -168,7 +168,7 @@ const { data: profile, error: profileError } = await supabase
   .eq('id', data.user.id)
   .single();
 console.log('Profile:', profile, profileError);
-\`\`\`
+```
 
 ## Checklist de Déploiement
 

@@ -11,13 +11,13 @@ Le système d'administration CampusEats supporte maintenant deux niveaux d'admin
 ## Architecture des Rôles
 
 ### Rôles Utilisateurs
-\`\`\`
+```
 - admin         : Administrateur principal (accès total)
 - sub-admin     : Administrateur secondaire (accès limité)
 - vendor        : Vendeur/Restaurant
 - delivery      : Personnel de livraison
 - client        : Client
-\`\`\`
+```
 
 ### Hiérarchie des Permissions
 
@@ -37,21 +37,21 @@ Le système d'administration CampusEats supporte maintenant deux niveaux d'admin
 
 ### Table `admin_actions`
 Traçabilité de toutes les actions administratives :
-\`\`\`sql
+```sql
 - id (UUID)
 - admin_id (UUID) - Référence vers users
 - action_type (TEXT) - Type d'action effectuée
 - target_user_id (UUID) - Utilisateur cible
 - details (JSONB) - Détails supplémentaires
 - created_at (TIMESTAMPTZ)
-\`\`\`
+```
 
 ### Colonnes ajoutées à `users`
-\`\`\`sql
+```sql
 - created_by (UUID) - Qui a créé cet utilisateur
 - approved_by (UUID) - Qui a approuvé cet utilisateur
 - status (TEXT) - 'pending', 'approved', 'rejected'
-\`\`\`
+```
 
 ## Pages et Routes
 
@@ -102,7 +102,7 @@ Approbation des images des vendeurs :
 
 #### POST `/api/admin/create-sub-admin`
 Crée un nouveau sous-administrateur
-\`\`\`json
+```json
 {
   "email": "subadmin@example.com",
   "firstName": "John",
@@ -110,33 +110,33 @@ Crée un nouveau sous-administrateur
   "phone": "+1234567890",
   "password": "optional" // Généré automatiquement si omis
 }
-\`\`\`
+```
 
 #### GET `/api/admin/pending-users`
 Récupère tous les utilisateurs en status "pending"
 
 #### POST `/api/admin/approve-user`
 Approuve un utilisateur en attente
-\`\`\`json
+```json
 {
   "userId": "uuid"
 }
-\`\`\`
+```
 
 #### POST `/api/admin/reject-user`
 Rejette un utilisateur en attente
-\`\`\`json
+```json
 {
   "userId": "uuid"
 }
-\`\`\`
+```
 
 ## Système de Permissions
 
 ### Fichier `lib/utils/permissions.ts`
 Fonctions utilitaires pour gérer les permissions :
 
-\`\`\`typescript
+```typescript
 // Vérifier si un utilisateur a une permission
 hasPermission(userRole, 'VIEW_ALL_USERS') // boolean
 
@@ -148,7 +148,7 @@ canViewUser(adminRole, targetRole) // boolean
 
 // Masquer l'email pour les sub-admins
 getMaskedEmail(email, userRole) // string
-\`\`\`
+```
 
 ### Politiques RLS (Row Level Security)
 
@@ -195,11 +195,11 @@ getMaskedEmail(email, userRole) // string
 ## Design Responsive
 
 ### Breakpoints Tailwind
-\`\`\`css
+```css
 - mobile : < 640px (sm)
 - tablet : 640px - 1024px (md, lg)
 - desktop : > 1024px (lg, xl, 2xl)
-\`\`\`
+```
 
 ### Stratégies Responsive Utilisées
 
@@ -225,12 +225,12 @@ getMaskedEmail(email, userRole) // string
 
 Pour activer le système d'administration, exécutez dans l'ordre :
 
-\`\`\`bash
+```bash
 # 1. Ajouter le rôle sub-admin et les colonnes de tracking
 scripts/008_add_sub_admin_role.sql
 
 # 2. Les autres scripts existants sont déjà en place
-\`\`\`
+```
 
 ## Variables d'Environnement Requises
 
@@ -313,9 +313,9 @@ L'application a été complètement migrée de Firebase vers Supabase. Voir `SUP
 ### Logs de Debug
 
 Tous les logs de debug commencent par `[v0]` pour faciliter le filtrage :
-\`\`\`typescript
+```typescript
 console.log('[v0] Action effectuée')
-\`\`\`
+```
 
 ## Fichiers Principaux
 

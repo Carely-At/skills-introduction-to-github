@@ -73,14 +73,14 @@ Toutes les tables ont des politiques RLS activées pour sécuriser les données 
 ### Configuration
 
 **Avant (Firebase)**
-\`\`\`typescript
+```typescript
 import { getFirebaseAuth, getFirebaseDB } from './lib/firebase/config'
 const auth = getFirebaseAuth()
 const db = getFirebaseDB()
-\`\`\`
+```
 
 **Après (Supabase)**
-\`\`\`typescript
+```typescript
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 
@@ -89,56 +89,56 @@ const supabase = createClient()
 
 // Server-side
 const supabase = await createServerClient()
-\`\`\`
+```
 
 ### Authentification
 
 **Avant (Firebase)**
-\`\`\`typescript
+```typescript
 import { signInWithEmailAndPassword } from 'firebase/auth'
 await signInWithEmailAndPassword(auth, email, password)
-\`\`\`
+```
 
 **Après (Supabase)**
-\`\`\`typescript
+```typescript
 const { data, error } = await supabase.auth.signInWithPassword({
   email,
   password
 })
-\`\`\`
+```
 
 ### Base de Données
 
 **Avant (Firestore)**
-\`\`\`typescript
+```typescript
 import { collection, getDocs, query, where } from 'firebase/firestore'
 
 const q = query(collection(db, 'menuItems'), where('vendorId', '==', userId))
 const snapshot = await getDocs(q)
 const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-\`\`\`
+```
 
 **Après (Supabase)**
-\`\`\`typescript
+```typescript
 const { data, error } = await supabase
   .from('menu_items')
   .select('*')
   .eq('vendor_id', userId)
-\`\`\`
+```
 
 ### Storage
 
 **Avant (Firebase)**
-\`\`\`typescript
+```typescript
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 
 const storageRef = ref(storage, `path/to/file`)
 await uploadBytes(storageRef, file)
 const url = await getDownloadURL(storageRef)
-\`\`\`
+```
 
 **Après (Supabase)**
-\`\`\`typescript
+```typescript
 const { error } = await supabase.storage
   .from('vendor-images')
   .upload(path, file)
@@ -146,19 +146,19 @@ const { error } = await supabase.storage
 const { data: { publicUrl } } = supabase.storage
   .from('vendor-images')
   .getPublicUrl(path)
-\`\`\`
+```
 
 ## Scripts de Migration
 
 ### 1. Configuration Initiale
-\`\`\`bash
+```bash
 # Exécuter dans l'ordre :
 scripts/01-create-users-table.sql
 scripts/02-create-profiles-tables.sql
 scripts/03-create-menu-tables.sql
 scripts/04-create-orders-tables.sql
 scripts/05-create-storage-bucket.sql
-\`\`\`
+```
 
 ### 2. Données Existantes (si nécessaire)
 
@@ -173,7 +173,7 @@ Si vous avez des données Firebase existantes à migrer :
 Remplacez les variables Firebase par celles de Supabase :
 
 **Supprimer**
-\`\`\`
+```
 NEXT_PUBLIC_FIREBASE_API_KEY
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
 NEXT_PUBLIC_FIREBASE_PROJECT_ID
@@ -182,16 +182,16 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
 NEXT_PUBLIC_FIREBASE_APP_ID
 FIREBASE_CLIENT_EMAIL
 FIREBASE_PRIVATE_KEY
-\`\`\`
+```
 
 **Utiliser**
-\`\`\`
+```
 SUPABASE_URL (déjà configuré)
 NEXT_PUBLIC_SUPABASE_URL (déjà configuré)
 SUPABASE_ANON_KEY (déjà configuré)
 NEXT_PUBLIC_SUPABASE_ANON_KEY (déjà configuré)
 SUPABASE_SERVICE_ROLE_KEY (déjà configuré)
-\`\`\`
+```
 
 ## Avantages de la Migration
 

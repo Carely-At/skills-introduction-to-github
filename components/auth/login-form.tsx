@@ -1,15 +1,16 @@
 "use client"
 
 import type React from "react"
+import Link from "next/link"
 
 import { useState } from "react"
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
 import { signIn } from "@/lib/supabase/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Loader2, Mail, Lock, AlertCircle, Shield } from 'lucide-react'
+import { Loader2, Mail, Lock, AlertCircle, Shield } from "lucide-react"
 
 export function LoginForm() {
   const router = useRouter()
@@ -39,7 +40,7 @@ export function LoginForm() {
           delivery: "/dashboard/delivery",
           client: "/dashboard/client",
         }
-        
+
         // Use window.location for hard navigation to trigger middleware
         window.location.href = dashboardMap[result.userData.role]
       } else {
@@ -74,9 +75,9 @@ export function LoginForm() {
         console.log("[v0] Admin initialized successfully")
         setError("")
         setShowInitButton(false)
-        
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+
         const signInResult = await signIn(identifier, password)
         if (signInResult.success && signInResult.userData) {
           console.log("[v0] Auto-login successful, redirecting")
@@ -99,27 +100,29 @@ export function LoginForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 bg-card p-8 rounded-2xl border border-border shadow-2xl shadow-primary/5"
+      className="space-y-5 bg-card p-8 rounded-2xl border border-border shadow-2xl shadow-primary/5"
     >
       {error && (
-        <Alert variant="destructive" className="border-destructive/50 bg-destructive/5">
+        <Alert variant="destructive" className="border-red-200 bg-red-50">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription className="text-red-800">{error}</AlertDescription>
         </Alert>
       )}
 
       {showInitButton && (
-        <Alert className="border-primary/50 bg-primary/5">
-          <Shield className="h-4 w-4" />
-          <AlertTitle>Compte administrateur non initialisé</AlertTitle>
+        <Alert className="border-blue-200 bg-blue-50">
+          <Shield className="h-4 w-4 text-blue-600" />
+          <AlertTitle className="text-blue-900">Compte administrateur non initialisé</AlertTitle>
           <AlertDescription className="mt-2 space-y-2">
-            <p className="text-sm">Le compte administrateur n'existe pas encore. Cliquez ci-dessous pour l'initialiser.</p>
+            <p className="text-sm text-blue-800">
+              Le compte administrateur n'existe pas encore. Cliquez ci-dessous pour l'initialiser.
+            </p>
             <Button
               type="button"
               onClick={handleInitializeAdmin}
               disabled={initializingAdmin}
               size="sm"
-              className="mt-2"
+              className="mt-2 bg-blue-600 hover:bg-blue-700"
             >
               {initializingAdmin ? (
                 <>
@@ -138,31 +141,35 @@ export function LoginForm() {
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="identifier" className="text-sm font-semibold">
+        <Label htmlFor="identifier" className="text-sm font-medium text-gray-700">
           Email ou CampusID
         </Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <Input
             id="identifier"
             type="text"
-            placeholder="exemple@email.com ou CLI-123456789"
+            placeholder="etudiant@univ.edu"
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             required
-            className="pl-10 h-11 border-border focus:border-primary transition-colors"
+            className="pl-11 h-12 border-gray-300 focus:border-[#4F46E5] focus:ring-[#4F46E5] text-base"
             disabled={loading}
           />
         </div>
-        <p className="text-xs text-muted-foreground">Utilisez votre email ou votre identifiant CampusID</p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-sm font-semibold">
-          Mot de passe
-        </Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+            Mot de passe
+          </Label>
+          <Link href="/forgot-password" className="text-xs text-[#EF4444] hover:text-[#DC2626] hover:underline">
+            Mot de passe oublié ?
+          </Link>
+        </div>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <Input
             id="password"
             type="password"
@@ -170,7 +177,7 @@ export function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="pl-10 h-11 border-border focus:border-primary transition-colors"
+            className="pl-11 h-12 border-gray-300 focus:border-[#4F46E5] focus:ring-[#4F46E5] text-base"
             disabled={loading}
           />
         </div>
@@ -178,7 +185,7 @@ export function LoginForm() {
 
       <Button
         type="submit"
-        className="w-full h-11 text-base font-semibold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all"
+        className="w-full h-12 text-base font-semibold bg-[#EF4444] hover:bg-[#DC2626] text-white shadow-lg hover:shadow-xl transition-all"
         disabled={loading}
       >
         {loading ? (

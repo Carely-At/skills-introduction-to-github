@@ -86,7 +86,7 @@ Utilisez cette checklist pour vous assurer que tout est configuré :
 
 Assurez-vous que votre fichier `.env.local` contient toutes ces variables :
 
-\`\`\`env
+```env
 # Firebase Configuration (trouvez ces valeurs dans Firebase Console → Project Settings → General)
 NEXT_PUBLIC_FIREBASE_API_KEY=AIza...
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=votre-projet.firebaseapp.com
@@ -105,7 +105,7 @@ SENDGRID_FROM_EMAIL=noreply@votredomaine.com
 
 # URL de l'application
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-\`\`\`
+```
 
 ## Où Trouver les Clés Firebase ?
 

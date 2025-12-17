@@ -8,7 +8,7 @@ L'erreur `Component auth has not been registered yet` se produit à cause d'une 
 
 J'ai fixé les versions exactes des packages Firebase dans `package.json` pour garantir la compatibilité :
 
-\`\`\`json
+```json
 {
   "firebase": "10.13.2",
   "firebase-admin": "12.4.0",
@@ -17,13 +17,13 @@ J'ai fixé les versions exactes des packages Firebase dans `package.json` pour g
   "@firebase/firestore": "4.7.2",
   "@firebase/storage": "0.13.2"
 }
-\`\`\`
+```
 
 ## Étapes pour appliquer la correction
 
 ### 1. Supprimer les anciennes dépendances
 
-\`\`\`bash
+```bash
 # Si vous utilisez npm
 rm -rf node_modules package-lock.json
 npm install
@@ -35,17 +35,17 @@ yarn install
 # Si vous utilisez pnpm
 rm -rf node_modules pnpm-lock.yaml
 pnpm install
-\`\`\`
+```
 
 ### 2. Redémarrer le serveur de développement
 
-\`\`\`bash
+```bash
 npm run dev
 # ou
 yarn dev
 # ou
 pnpm dev
-\`\`\`
+```
 
 ### 3. Vérifier que l'erreur est résolue
 
@@ -70,7 +70,7 @@ En fixant les versions exactes (sans `^` ou `~`), nous empêchons le gestionnair
 
 Si vous rencontrez toujours des problèmes, vous pouvez essayer ces versions alternatives :
 
-\`\`\`json
+```json
 {
   "firebase": "10.12.4",
   "@firebase/app": "0.10.10",
@@ -78,7 +78,7 @@ Si vous rencontrez toujours des problèmes, vous pouvez essayer ces versions alt
   "@firebase/firestore": "4.7.1",
   "firebase-admin": "12.1.0"
 }
-\`\`\`
+```
 
 ## Référence
 

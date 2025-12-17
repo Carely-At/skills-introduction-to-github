@@ -60,31 +60,31 @@ Voir [scripts/README.md](./scripts/README.md) pour plus de détails.
 
 ### 1. Cloner le projet
 
-\`\`\`bash
+```bash
 git clone https://github.com/votre-username/campuseats.git
 cd campuseats
-\`\`\`
+```
 
 ### 2. Installer les dépendances
 
-\`\`\`bash
+```bash
 npm install
 # ou
 yarn install
 # ou
 pnpm install
-\`\`\`
+```
 
 **⚠️ IMPORTANT - Compatibilité des versions Firebase** :
 
 Si vous rencontrez l'erreur `Component auth has not been registered yet`, c'est dû à une incompatibilité entre les versions des packages Firebase. Les versions exactes ont été fixées dans `package.json` pour éviter ce problème.
 
 Si l'erreur persiste après l'installation :
-\`\`\`bash
+```bash
 # Nettoyez et réinstallez les dépendances
 rm -rf node_modules package-lock.json
 npm install
-\`\`\`
+```
 
 Pour plus de détails, consultez [FIREBASE_VERSION_FIX.md](./FIREBASE_VERSION_FIX.md).
 
@@ -128,13 +128,13 @@ Pour plus de détails, consultez [FIREBASE_VERSION_FIX.md](./FIREBASE_VERSION_FI
 
 Copiez le fichier `.env.example` vers `.env.local` :
 
-\`\`\`bash
+```bash
 cp .env.example .env.local
-\`\`\`
+```
 
 Remplissez toutes les variables :
 
-\`\`\`env
+```env
 # Supabase Configuration
 SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -152,23 +152,23 @@ SENDGRID_FROM_EMAIL=noreply@votredomaine.com
 
 # App URL
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-\`\`\`
+```
 
 ### 6. Créer l'administrateur principal
 
 Pour créer le compte administrateur initial :
 
-\`\`\`bash
+```bash
 npm run seed:admin
-\`\`\`
+```
 
 Cela créera automatiquement le compte admin avec les identifiants définis dans `.env.local`.
 
 ### 7. Lancer l'application en local
 
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 
 L'application sera accessible sur [http://localhost:3000](http://localhost:3000)
 
@@ -178,14 +178,14 @@ L'application sera accessible sur [http://localhost:3000](http://localhost:3000)
 
 #### 1. Pusher le code sur GitHub
 
-\`\`\`bash
+```bash
 git init
 git add .
 git commit -m "Initial commit"
 git branch -M main
 git remote add origin https://github.com/votre-username/campuseats.git
 git push -u origin main
-\`\`\`
+```
 
 #### 2. Obtenir les credentials Supabase Admin SDK
 
@@ -214,30 +214,30 @@ Pour créer l'administrateur automatiquement, vous avez besoin des credentials S
 Dans les paramètres du projet Vercel → Environment Variables, ajoutez **TOUTES** les variables suivantes :
 
 **Variables Supabase** :
-\`\`\`
+```
 SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-\`\`\`
+```
 
 **Variables Admin** :
-\`\`\`
+```
 ADMIN_EMAIL=kellyatemenou@gmail.com
 ADMIN_PASSWORD=@Carely_21
-\`\`\`
+```
 
 **Variables SendGrid** :
-\`\`\`
+```
 SENDGRID_API_KEY=SG.xxxxxxxxxxxxx
 SENDGRID_FROM_EMAIL=noreply@votredomaine.com
-\`\`\`
+```
 
 **URL de l'application** :
-\`\`\`
+```
 NEXT_PUBLIC_APP_URL=https://votre-app.vercel.app
-\`\`\`
+```
 
 ⚠️ **Notes importantes** :
 - Assurez-vous que toutes les variables `NEXT_PUBLIC_*` sont ajoutées pour les environnements **Production**, **Preview** et **Development**
@@ -249,7 +249,7 @@ Après avoir ajouté les variables d'environnement, cliquez sur "Redeploy" pour 
 
 ### Option 2 : Déploiement via CLI Vercel
 
-\`\`\`bash
+```bash
 # Installer Vercel CLI
 npm i -g vercel
 
@@ -265,7 +265,7 @@ vercel env add SUPABASE_URL
 
 # Redéployer avec les variables
 vercel --prod
-\`\`\`
+```
 
 ## 🔐 Configuration post-déploiement
 
@@ -355,7 +355,7 @@ Le CampusID est envoyé par email et peut être utilisé pour se connecter à la
 
 ## 🛠️ Scripts disponibles
 
-\`\`\`bash
+```bash
 # Développement
 npm run dev
 
@@ -370,11 +370,11 @@ npm run lint
 
 # Créer l'admin
 npm run seed:admin
-\`\`\`
+```
 
 ## 📝 Structure du projet
 
-\`\`\`
+```
 campuseats/
 ├── app/
 │   ├── api/                    # API Routes
@@ -409,7 +409,7 @@ campuseats/
 │   └── 05-create-storage-bucket.sql
 ├── middleware.ts               # Middleware pour refresh token
 └── .env.example                # Exemple de variables d'environnement
-\`\`\`
+```
 
 ## 🔒 Sécurité
 

@@ -8,6 +8,15 @@ export function formatCFA(amount: number): string {
 }
 
 /**
+ * Format a number as CFA currency (alias for formatCFA)
+ * @param amount - The amount to format
+ * @returns Formatted currency string
+ */
+export function formatCurrency(amount: number): string {
+  return formatCFA(amount)
+}
+
+/**
  * Parse CFA currency string to number
  * @param cfaString - The CFA string to parse
  * @returns Parsed number

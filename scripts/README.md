@@ -49,7 +49,7 @@ Configure le stockage Supabase :
 
 ### Via le CLI Supabase
 
-\`\`\`bash
+```bash
 # Installer le CLI si nécessaire
 npm install -g supabase
 
@@ -61,7 +61,7 @@ supabase link --project-ref YOUR_PROJECT_REF
 
 # Exécuter les migrations
 supabase db push
-\`\`\`
+```
 
 ## Vérification
 
@@ -77,7 +77,7 @@ Après avoir exécuté tous les scripts, vérifiez que :
 
 Si vous devez annuler les changements :
 
-\`\`\`sql
+```sql
 -- Supprimer dans l'ordre inverse
 DROP TABLE IF EXISTS order_items CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
@@ -88,7 +88,7 @@ DROP TABLE IF EXISTS users CASCADE;
 
 -- Supprimer le bucket
 DELETE FROM storage.buckets WHERE id = 'vendor-images';
-\`\`\`
+```
 
 ## Notes Importantes
 

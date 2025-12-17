@@ -46,9 +46,9 @@ Ce guide vous aide à résoudre les problèmes courants rencontrés avec CampusE
 
 **Solution pour l'admin** :
 
-\`\`\`bash
+```bash
 npm run seed:admin
-\`\`\`
+```
 
 **Solution pour les autres utilisateurs** :
 - Les clients doivent s'inscrire via `/register`
@@ -79,14 +79,14 @@ npm run seed:admin
 
 1. Vérifiez que `.env.local` existe à la racine du projet
 2. Vérifiez que toutes ces variables sont présentes :
-   \`\`\`env
+   ```env
    NEXT_PUBLIC_FIREBASE_API_KEY=...
    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
    NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
    NEXT_PUBLIC_FIREBASE_APP_ID=...
-   \`\`\`
+   ```
 3. Assurez-vous qu'il n'y a pas d'espaces autour des `=`
 4. Redémarrez complètement le serveur Next.js
 
@@ -100,19 +100,19 @@ npm run seed:admin
 
 1. **Vérifiez le nom du fichier** : Doit être `.env.local` (pas `.env` seul)
 2. **Redémarrez le serveur** : Next.js ne recharge pas automatiquement les variables d'environnement
-   \`\`\`bash
+   ```bash
    # Arrêtez le serveur (Ctrl+C)
    npm run dev
-   \`\`\`
+   ```
 3. **Variables côté client** : Doivent commencer par `NEXT_PUBLIC_`
 4. **Vérifiez les guillemets** : N'utilisez PAS de guillemets autour des valeurs
-   \`\`\`env
+   ```env
    # ✅ CORRECT
    NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyB...
 
    # ❌ INCORRECT
    NEXT_PUBLIC_FIREBASE_API_KEY="AIzaSyB..."
-   \`\`\`
+   ```
 
 ---
 
@@ -179,7 +179,7 @@ npm run seed:admin
 **Erreur** : "Module not found" ou "Cannot find module"
 
 **Solution** :
-\`\`\`bash
+```bash
 # Localement, supprimez les dossiers et réinstallez
 rm -rf node_modules .next
 npm install
@@ -189,7 +189,7 @@ npm run build
 git add .
 git commit -m "Fix dependencies"
 git push
-\`\`\`
+```
 
 ---
 
@@ -276,9 +276,9 @@ git push
 
 1. Ouvrez la console du navigateur
 2. Tapez :
-   \`\`\`javascript
+   ```javascript
    console.log(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID)
-   \`\`\`
+   ```
 3. Si vous voyez votre Project ID, la configuration est OK
 4. Si vous voyez `undefined`, les variables ne sont pas chargées
 
