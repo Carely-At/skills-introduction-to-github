@@ -19,6 +19,12 @@ import {
   Home,
   Settings,
   LogOut,
+  Search,
+  ChevronRight,
+  Coffee,
+  IceCreamCone,
+  ShoppingCart,
+  Utensils,
 } from "lucide-react"
 import { signOut } from "@/lib/supabase/auth"
 import { useRouter } from "next/navigation"
@@ -26,7 +32,7 @@ import { MenuBrowser } from "./menu-browser"
 import { OrderHistory } from "./order-history"
 import { Cart } from "./cart"
 import { formatCurrency } from "@/lib/utils/currency"
-import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 export function ClientDashboard() {
   const { userData } = useAuth()
@@ -35,10 +41,7 @@ export function ClientDashboard() {
   const [searchQuery, setSearchQuery] = useState("")
   const [cartItems, setCartItems] = useState<any[]>([])
 
-  console.log("[v0] ClientDashboard rendering, userData:", userData)
-
   const handleSignOut = async () => {
-    console.log("[v0] Client signing out")
     await signOut()
     router.push("/login")
   }
@@ -66,243 +69,256 @@ export function ClientDashboard() {
   }
 
   if (!userData) {
-    console.log("[v0] ClientDashboard: userData not available yet")
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     )
   }
 
+  // Categories data
+  const categories = [
+    { label: "Food", icon: <UtensilsCrossed className="w-6 h-6" />, href: "#", active: true },
+    { label: "Snacks", icon: <Coffee className="w-6 h-6" />, href: "#" },
+    { label: "Drinks", icon: <IceCreamCone className="w-6 h-6" />, href: "#" },
+    { label: "Groceries", icon: <ShoppingCart className="w-6 h-6" />, href: "#" },
+    { label: "Services", icon: <Utensils className="w-6 h-6" />, href: "#" },
+  ]
+
+  // Featured restaurants
+  const featuredRestaurants = [
+    {
+      id: "1",
+      name: "Sushi Campus",
+      image: "/assorted-sushi-platter.png",
+      rating: 4.8,
+      deliveryTime: "20-30 min",
+      location: "Bâtiment A",
+      category: "Japonais",
+    },
+    {
+      id: "2",
+      name: "Mama Pizza",
+      image: "/delicious-pizza.png",
+      rating: 4.9,
+      deliveryTime: "15-20 min",
+      location: "Campus Nord",
+      category: "Italien",
+    },
+    {
+      id: "3",
+      name: "Le Bistrot B.",
+      image: "/classic-beef-burger.png",
+      rating: 4.2,
+      deliveryTime: "10-15 min",
+      location: "RDC Sciences",
+      category: "Américain",
+    },
+  ]
+
   const renderHomeView = () => {
     return (
-      <div className="space-y-6">
-        {/* Greeting Card */}
-        <div className="bg-gradient-to-br from-primary via-primary to-accent rounded-3xl p-6 sm:p-8 text-primary-foreground shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              }}
-            />
-          </div>
-
-          <div className="relative z-10">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2">Bienvenue, {userData?.firstName}</h2>
-            <div className="flex items-center gap-2 text-primary-foreground/90">
-              <Clock className="h-4 w-4" />
-              <p className="text-sm sm:text-base">Vous êtes EN LIGNE et recevez des commandes.</p>
-            </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="mt-4 bg-white/20 hover:bg-white/30 text-primary-foreground border-white/20"
-              onClick={() => router.push("/dashboard/cart")}
-            >
-              Voir la carte de chaleur
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-soft transition-smooth">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <UtensilsCrossed className="h-5 w-5 text-green-600" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground">Revenus du jour</span>
-            </div>
-            <p className="text-2xl font-bold">{formatCurrency(84.5)}</p>
-            <p className="text-xs text-green-600 font-medium mt-1">+14%</p>
-          </div>
-
-          <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-soft transition-smooth">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <ShoppingBag className="h-5 w-5 text-blue-600" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground">Livraisons terminées</span>
-            </div>
-            <p className="text-2xl font-bold">12</p>
-            <p className="text-xs text-blue-600 font-medium mt-1">+4</p>
-          </div>
-
-          <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-soft transition-smooth">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Clock className="h-5 w-5 text-amber-600" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground">Temps actif</span>
-            </div>
-            <p className="text-2xl font-bold">3h 20m</p>
-          </div>
-
-          <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-soft transition-smooth">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Star className="h-5 w-5 text-purple-600" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground">Note livreur</span>
-            </div>
-            <p className="text-2xl font-bold">4.9</p>
-            <p className="text-xs text-green-600 font-medium mt-1">+0.3</p>
-          </div>
-        </div>
-
-        {/* Current Order Section */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold">Ma Commande en Cours</h3>
-            <Link href="#" className="text-sm text-primary font-medium hover:underline">
-              EN LIVRAISON
-            </Link>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-2xl bg-muted overflow-hidden flex-shrink-0">
-                <img src="/classic-beef-burger.png" alt="Le Burger Étudiant" className="w-full h-full object-cover" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-muted-foreground mb-1">EN COURS</p>
-                <h4 className="font-semibold mb-1">Le Burger Étudiant</h4>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3" />
-                  <span>Bâtiment Étudiant, Restauration</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-lg">{formatCurrency(12.5)}</p>
-                <p className="text-xs text-muted-foreground">12:45</p>
-                <p className="text-xs text-muted-foreground">Aujourd'hui</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm">
-              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-2/3 rounded-full transition-all" />
-              </div>
-              <span className="text-xs font-medium text-primary">En cuisine</span>
-            </div>
-
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex-1 bg-transparent">
-                <Phone className="h-4 w-4 mr-2" />
-                Appeler
-              </Button>
-              <Button variant="outline" className="flex-1 bg-transparent">
-                <MessageCircle className="h-4 w-4 mr-2" />
-                Message
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Special Offers */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">Offres Spéciales</h3>
-            <Button variant="ghost" size="sm" className="text-primary font-medium">
-              Voir tout →
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-6 text-white relative overflow-hidden shadow-xl">
-              <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold">
-                PROMO
-              </div>
-              <div className="relative z-10">
-                <Sparkles className="h-8 w-8 mb-3" />
-                <h4 className="text-xl font-bold mb-2">Menu Tacos -20%</h4>
-                <p className="text-sm text-white/90 mb-4">Valable jusqu'au 31 janvier sur le campus</p>
-                <Button variant="secondary" size="sm" className="bg-white text-blue-700 hover:bg-white/90">
-                  En profiter
-                </Button>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-3xl p-6 text-white relative overflow-hidden shadow-xl">
-              <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold">
-                LIVRAISON
-              </div>
-              <div className="relative z-10">
-                <Truck className="h-8 w-8 mb-3" />
-                <h4 className="text-xl font-bold mb-2">Frais offerts</h4>
-                <p className="text-sm text-white/90 mb-4">Sur votre prochain repas ce weekend</p>
-                <Button variant="secondary" size="sm" className="bg-white text-orange-700 hover:bg-white/90">
-                  Voir les restos
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Restaurants à proximité */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">Restaurants à proximité</h3>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="text-xs bg-transparent">
-                Tous
-              </Button>
-              <Button variant="ghost" size="sm" className="text-xs">
-                Sur le campus
-              </Button>
-              <Button variant="ghost" size="sm" className="text-xs">
-                Hors campus
-              </Button>
-              <Button variant="ghost" size="sm" className="text-xs">
-                Favori
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              {
-                name: "Sushi Campus",
-                time: "20-30 min",
-                rating: 4.8,
-                image: "/assorted-sushi-platter.png",
-              },
-              {
-                name: "Mama Pizza",
-                time: "15-20 min",
-                rating: 4.9,
-                image: "/delicious-pizza.png",
-              },
-              {
-                name: "Le Bistrot B...",
-                time: "10-14 min",
-                rating: 4.2,
-                image: "/classic-beef-burger.png",
-              },
-            ].map((restaurant, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveView("menu")}
-                className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-soft-lg transition-smooth text-left"
-              >
-                <div className="relative h-32 bg-muted overflow-hidden">
+      <div className="space-y-8 pb-24 lg:pb-8">
+        {/* Hero Slider */}
+        <div className="relative">
+          <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+            <div className="flex gap-4" style={{ width: "max-content" }}>
+              {featuredRestaurants.map((restaurant) => (
+                <button
+                  key={restaurant.id}
+                  onClick={() => setActiveView("menu")}
+                  className="relative w-[85vw] sm:w-[400px] aspect-[16/9] rounded-2xl overflow-hidden group flex-shrink-0"
+                >
                   <img
                     src={restaurant.image || "/placeholder.svg"}
                     alt={restaurant.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {restaurant.time}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+
+                  {/* Badge */}
+                  <div className="absolute top-4 left-4">
+                    <span className="badge-primary">{restaurant.category}</span>
+                  </div>
+
+                  {/* Content */}
+                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                    <h3 className="text-xl font-bold text-foreground mb-2">{restaurant.name}</h3>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-warning fill-warning" />
+                        <span className="text-foreground font-medium">{restaurant.rating}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{restaurant.deliveryTime}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>{restaurant.location}</span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Categories */}
+        <div>
+          <h3 className="text-lg font-bold text-foreground mb-4">Catégories</h3>
+          <div className="grid grid-cols-5 gap-3">
+            {categories.map((cat, index) => (
+              <button
+                key={index}
+                className={cn(
+                  "flex flex-col items-center gap-2 p-4 rounded-2xl transition-all duration-200",
+                  cat.active
+                    ? "bg-primary/20 text-primary border border-primary/30"
+                    : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border/50",
+                )}
+              >
+                <div
+                  className={cn(
+                    "w-12 h-12 rounded-xl flex items-center justify-center",
+                    cat.active ? "bg-primary/20" : "bg-muted/50",
+                  )}
+                >
+                  {cat.icon}
+                </div>
+                <span className="text-xs font-medium">{cat.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Promotions */}
+        <div>
+          <h3 className="text-lg font-bold text-foreground mb-4">Offres Spéciales</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/80 to-primary p-6 glow-primary">
+              <div className="absolute top-3 right-3 badge-accent">PROMO</div>
+              <Sparkles className="h-8 w-8 text-primary-foreground mb-3" />
+              <h4 className="text-xl font-bold text-primary-foreground mb-2">Menu Tacos -20%</h4>
+              <p className="text-sm text-primary-foreground/80 mb-4">Tous les mardis sur le campus</p>
+              <Button size="sm" className="bg-background text-foreground hover:bg-background/90">
+                En profiter
+              </Button>
+            </div>
+
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-accent/80 to-accent p-6 glow-accent">
+              <div className="absolute top-3 right-3 badge-primary">LIVRAISON</div>
+              <Truck className="h-8 w-8 text-accent-foreground mb-3" />
+              <h4 className="text-xl font-bold text-accent-foreground mb-2">Frais offerts</h4>
+              <p className="text-sm text-accent-foreground/80 mb-4">{"Dès 15€ d'achat ce weekend"}</p>
+              <Button size="sm" className="bg-background text-foreground hover:bg-background/90">
+                Voir les restos
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Order Card */}
+        <div className="card-dark p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-foreground">Ma Commande en Cours</h3>
+            <span className="badge-success">EN LIVRAISON</span>
+          </div>
+
+          <div className="flex gap-4 mb-4">
+            <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+              <img src="/classic-beef-burger.png" alt="Order" className="w-full h-full object-cover" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-semibold text-foreground">Le Burger Étudiant</h4>
+              <p className="text-sm text-muted-foreground">Menu XL + Boisson</p>
+              <p className="text-primary font-bold mt-1">{formatCurrency(12.5)}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-lg font-bold text-primary">12:45</p>
+              <p className="text-xs text-muted-foreground">Arrivée estimée</p>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+              <span>Confirmée</span>
+              <span>Préparation</span>
+              <span className="text-primary font-medium">En route</span>
+              <span>Livrée</span>
+            </div>
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className="h-full bg-primary w-3/4 rounded-full transition-all" />
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1 btn-outline bg-transparent">
+              <Phone className="h-4 w-4 mr-2" />
+              Appeler
+            </Button>
+            <Button variant="outline" className="flex-1 btn-outline bg-transparent">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Message
+            </Button>
+          </div>
+        </div>
+
+        {/* Nearby Restaurants */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-foreground">Restaurants à proximité</h3>
+            <Button variant="ghost" size="sm" className="text-primary">
+              Voir tout
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+
+          {/* Filter tabs */}
+          <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-2">
+            {["Tous", "Sur le campus", "Hors campus", "Favoris"].map((filter, index) => (
+              <Button
+                key={filter}
+                variant={index === 0 ? "default" : "outline"}
+                size="sm"
+                className={cn("whitespace-nowrap", index === 0 ? "btn-primary" : "btn-outline")}
+              >
+                {filter}
+              </Button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {featuredRestaurants.map((restaurant) => (
+              <button
+                key={restaurant.id}
+                onClick={() => setActiveView("menu")}
+                className="card-dark-hover overflow-hidden text-left"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img
+                    src={restaurant.image || "/placeholder.svg"}
+                    alt={restaurant.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute top-3 left-3 badge-primary">{restaurant.category}</div>
+                  <div className="absolute bottom-3 left-3 bg-background/80 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-medium text-foreground">
+                    {restaurant.deliveryTime}
                   </div>
                 </div>
                 <div className="p-4">
-                  <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors">{restaurant.name}</h4>
-                  <div className="flex items-center gap-1 text-sm">
-                    <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                    <span className="font-medium">{restaurant.rating}</span>
-                    <span className="text-muted-foreground">★</span>
+                  <h4 className="font-semibold text-foreground mb-2">{restaurant.name}</h4>
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-warning fill-warning" />
+                      <span className="font-medium text-foreground">{restaurant.rating}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-muted-foreground">
+                      <MapPin className="w-3 h-3" />
+                      <span>{restaurant.location}</span>
+                    </div>
                   </div>
                 </div>
               </button>
@@ -310,284 +326,280 @@ export function ClientDashboard() {
           </div>
         </div>
 
-        {/* Recent Reviews */}
+        {/* Recent Orders */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">Commentaires Récents</h3>
-            <Button variant="ghost" size="sm" className="text-primary font-medium">
-              Voir tout →
+            <h3 className="text-lg font-bold text-foreground">Commandes Récentes</h3>
+            <Button variant="ghost" size="sm" className="text-primary" onClick={() => setActiveView("orders")}>
+              Voir tout
+              <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="space-y-3">
             {[
-              {
-                name: "Sarah M.",
-                time: "Il y a 2h",
-                rating: 5,
-                comment: "L'excitation pour repas rapide et la nourriture était encore chaude ! Merci Alex !",
-                restaurant: "Le Bistro",
-                badges: ["RAPIDE", "5 ÉTOILES"],
-              },
-              {
-                name: "Mike T.",
-                time: "il y a 45m",
-                rating: 3,
-                comment: "L'attention livrer était bonne mais est arrivés tarde. Dommage car les saveurs sum i...",
-                restaurant: "Sushi World",
-                badges: [],
-              },
-            ].map((review, index) => (
-              <div key={index} className="bg-card border border-border rounded-2xl p-5">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-sm">
-                      {review.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-sm">{review.name}</p>
-                      <p className="text-xs text-muted-foreground">{review.time}</p>
-                    </div>
+              { name: "Sushi Campus", items: "2 articles", total: 18.5, time: "Hier" },
+              { name: "Cafétéria Lettres", items: "1 article", total: 4.2, time: "12 Oct" },
+              { name: "Burger King", items: "3 articles", total: 24.7, time: "10 Oct" },
+            ].map((order, index) => (
+              <div key={index} className="card-dark p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                    <UtensilsCrossed className="w-5 h-5 text-primary" />
                   </div>
-                  <div className="flex">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${i < review.rating ? "fill-amber-400 text-amber-400" : "text-muted"}`}
-                      />
-                    ))}
+                  <div>
+                    <p className="font-medium text-foreground">{order.name}</p>
+                    <p className="text-xs text-muted-foreground">{order.items}</p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-3">{review.comment}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-primary">{review.restaurant}</span>
-                  {review.badges.map((badge, i) => (
-                    <span key={i} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-                      {badge}
-                    </span>
-                  ))}
+                <div className="text-right">
+                  <p className="font-bold text-primary">{formatCurrency(order.total)}</p>
+                  <p className="text-xs text-muted-foreground">{order.time}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Help Card */}
+        <div className="card-dark p-5 bg-highlight/10 border-highlight/30">
+          <h4 className="font-bold text-foreground mb-2">{"Besoin d'aide ?"}</h4>
+          <p className="text-sm text-muted-foreground mb-4">Un problème avec votre commande en cours ?</p>
+          <Button variant="outline" className="btn-outline bg-transparent">
+            Contacter le support
+          </Button>
+        </div>
       </div>
     )
   }
 
-  // Main render with navigation
+  const renderProfileView = () => {
+    return (
+      <div className="space-y-6 pb-24 lg:pb-8">
+        {/* Profile Header */}
+        <div className="card-dark p-6 text-center">
+          <div className="w-24 h-24 rounded-full bg-primary/20 mx-auto mb-4 flex items-center justify-center">
+            <User className="w-12 h-12 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground">
+            {userData?.firstName} {userData?.lastName}
+          </h2>
+          <p className="text-muted-foreground">{userData?.email}</p>
+          <div className="mt-4">
+            <span className="badge-primary">{userData?.campusId}</span>
+          </div>
+        </div>
+
+        {/* Profile Stats */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="card-dark p-4 text-center">
+            <p className="text-2xl font-bold text-primary">12</p>
+            <p className="text-xs text-muted-foreground">Commandes</p>
+          </div>
+          <div className="card-dark p-4 text-center">
+            <p className="text-2xl font-bold text-accent">4.8</p>
+            <p className="text-xs text-muted-foreground">Note moyenne</p>
+          </div>
+          <div className="card-dark p-4 text-center">
+            <p className="text-2xl font-bold text-highlight">{formatCurrency(245)}</p>
+            <p className="text-xs text-muted-foreground">Total dépensé</p>
+          </div>
+        </div>
+
+        {/* Profile Menu */}
+        <div className="card-dark overflow-hidden">
+          {[
+            { icon: <User className="w-5 h-5" />, label: "Informations personnelles" },
+            { icon: <MapPin className="w-5 h-5" />, label: "Adresses de livraison" },
+            { icon: <Bell className="w-5 h-5" />, label: "Notifications" },
+            { icon: <Settings className="w-5 h-5" />, label: "Paramètres" },
+          ].map((item, index) => (
+            <button
+              key={index}
+              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors border-b border-border last:border-0"
+              onClick={() => router.push("/dashboard/settings")}
+            >
+              <div className="flex items-center gap-3">
+                <div className="text-muted-foreground">{item.icon}</div>
+                <span className="text-foreground">{item.label}</span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+          ))}
+        </div>
+
+        {/* Logout */}
+        <Button
+          variant="outline"
+          className="w-full btn-outline text-destructive border-destructive/30 hover:bg-destructive/10 bg-transparent"
+          onClick={handleSignOut}
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Déconnexion
+        </Button>
+      </div>
+    )
+  }
+
+  // Sidebar items
+  const sidebarItems = [
+    { icon: <Home className="w-5 h-5" />, label: "Accueil", view: "home" as const },
+    { icon: <UtensilsCrossed className="w-5 h-5" />, label: "Restaurants", view: "menu" as const },
+    { icon: <Clock className="w-5 h-5" />, label: "Mes Commandes", view: "orders" as const },
+    {
+      icon: <ShoppingBag className="w-5 h-5" />,
+      label: "Panier",
+      view: "cart" as const,
+      badge: cartItems.length || undefined,
+    },
+    { icon: <User className="w-5 h-5" />, label: "Mon Profil", view: "profile" as const },
+  ]
+
+  // Bottom nav items
+  const bottomNavItems = [
+    { icon: <Home className="w-5 h-5" />, label: "Accueil", view: "home" as const },
+    { icon: <Search className="w-5 h-5" />, label: "Rechercher", view: "menu" as const },
+    { icon: <ShoppingBag className="w-5 h-5" />, label: "Commandes", view: "orders" as const },
+    { icon: <Bell className="w-5 h-5" />, label: "Notifs", view: "home" as const },
+    { icon: <User className="w-5 h-5" />, label: "Profil", view: "profile" as const },
+  ]
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card sticky top-0 z-50 safe-area-top">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-soft">
-                <UtensilsCrossed className="h-6 w-6 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold hidden sm:block">CampusEats</span>
+      {/* Desktop Sidebar */}
+      <aside className="fixed left-0 top-0 h-full w-64 bg-card border-r border-border z-40 hidden lg:flex flex-col">
+        {/* Logo */}
+        <div className="p-6 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <span className="text-primary font-bold text-lg">CE</span>
             </div>
-
-            <div className="flex-1 max-w-md hidden md:block">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Rechercher un resto, un repas ou un article..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-10"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full" />
-              </Button>
-              <Button variant="ghost" size="icon" className="relative" onClick={() => setActiveView("cart")}>
-                <ShoppingBag className="h-5 w-5" />
-                {cartItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartItems.length}
-                  </span>
-                )}
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard/settings")}>
-                <User className="h-5 w-5" />
-              </Button>
+            <div>
+              <h1 className="font-bold text-foreground">CampusEats</h1>
+              <p className="text-xs text-muted-foreground">Étudiant</p>
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Side Navigation */}
-      <div className="flex">
-        <aside className="hidden lg:flex lg:w-64 border-r border-border bg-card min-h-[calc(100vh-73px)] flex-col p-4">
-          <nav className="space-y-2 flex-1">
-            <Button
-              variant={activeView === "home" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveView("home")}
-            >
-              <Home className="h-4 w-4 mr-3" />
-              Accueil
-            </Button>
-            <Button
-              variant={activeView === "menu" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveView("menu")}
-            >
-              <UtensilsCrossed className="h-4 w-4 mr-3" />
-              Restaurants
-            </Button>
-            <Button
-              variant={activeView === "orders" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveView("orders")}
-            >
-              <Clock className="h-4 w-4 mr-3" />
-              Mes Commandes
-            </Button>
-            <Button
-              variant={activeView === "profile" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveView("profile")}
-            >
-              <User className="h-4 w-4 mr-3" />
-              Mon Profil
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => router.push("/dashboard/settings")}>
-              <Settings className="h-4 w-4 mr-3" />
-              Paramètres
-            </Button>
-          </nav>
+        {/* Navigation */}
+        <nav className="flex-1 py-4 overflow-y-auto">
+          <div className="space-y-1 px-2">
+            {sidebarItems.map((item) => (
+              <button
+                key={item.view}
+                onClick={() => setActiveView(item.view)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                  activeView === item.view
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                )}
+              >
+                {item.icon}
+                <span className="flex-1 text-left">{item.label}</span>
+                {item.badge && <span className="badge-primary text-[10px]">{item.badge}</span>}
+              </button>
+            ))}
+          </div>
+        </nav>
 
-          <div className="pt-4 border-t border-border mt-auto">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 mb-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold">
-                {userData?.firstName?.charAt(0)}
-                {userData?.lastName?.charAt(0)}
+        {/* Logout */}
+        <div className="p-4 border-t border-border">
+          <button
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-destructive hover:bg-destructive/10 transition-all duration-200"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <div className="lg:pl-64">
+        {/* Top bar */}
+        <header className="sticky top-0 z-50 glass-dark">
+          <div className="container-responsive py-3">
+            <div className="flex items-center justify-between">
+              {/* Mobile logo */}
+              <div className="flex items-center gap-2 lg:hidden">
+                <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center">
+                  <span className="text-primary font-bold">CE</span>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate">
-                  {userData?.firstName} {userData?.lastName}
-                </p>
-                <p className="text-xs text-muted-foreground">Client</p>
+
+              {/* Search */}
+              <div className="flex-1 max-w-md mx-4 hidden sm:block">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Rechercher un plat ou un resto..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 input-dark"
+                  />
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <button className="relative w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+                    3
+                  </span>
+                </button>
+                <button
+                  onClick={() => setActiveView("cart")}
+                  className="relative w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => router.push("/dashboard/settings")}
+                  className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary hover:bg-primary/30 transition-all"
+                >
+                  <User className="w-5 h-5" />
+                </button>
               </div>
             </div>
-            <Button variant="outline" className="w-full bg-transparent" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Se déconnecter
-            </Button>
           </div>
-        </aside>
+        </header>
 
-        {/* Main Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 safe-area-bottom">
+        {/* Page content */}
+        <main className="container-responsive py-6">
           {activeView === "home" && renderHomeView()}
-          {activeView === "menu" && <MenuBrowser searchQuery={searchQuery} onAddToCart={addToCart} />}
+          {activeView === "menu" && <MenuBrowser onAddToCart={addToCart} />}
           {activeView === "orders" && <OrderHistory />}
           {activeView === "cart" && (
-            <Cart
-              items={cartItems}
-              onUpdateQuantity={updateQuantity}
-              onRemove={removeFromCart}
-              onClearCart={() => setCartItems([])}
-            />
+            <Cart cartItems={cartItems} onUpdateQuantity={updateQuantity} onRemove={removeFromCart} />
           )}
-          {activeView === "profile" && (
-            <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold mb-6">Mon Profil</h2>
-              <div className="bg-card p-6 rounded-2xl border border-border space-y-4">
-                <Button
-                  variant="outline"
-                  className="w-full bg-transparent"
-                  onClick={() => router.push("/dashboard/settings")}
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  Gérer ma photo de profil et paramètres
-                </Button>
-
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Nom complet</label>
-                  <p className="text-lg">
-                    {userData?.firstName} {userData?.lastName}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Email</label>
-                  <p className="text-lg break-all">{userData?.email}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">CampusID</label>
-                  <p className="text-lg font-mono">{userData?.campusId}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Téléphone</label>
-                  <p className="text-lg">{userData?.phone}</p>
-                </div>
-              </div>
-            </div>
-          )}
+          {activeView === "profile" && renderProfileView()}
         </main>
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border safe-area-bottom z-50">
-        <div className="grid grid-cols-5 gap-1 p-2">
-          <Button
-            variant={activeView === "home" ? "default" : "ghost"}
-            size="sm"
-            className="flex-col h-auto py-2 gap-1"
-            onClick={() => setActiveView("home")}
-          >
-            <Home className="h-5 w-5" />
-            <span className="text-xs">Accueil</span>
-          </Button>
-          <Button
-            variant={activeView === "menu" ? "default" : "ghost"}
-            size="sm"
-            className="flex-col h-auto py-2 gap-1"
-            onClick={() => setActiveView("menu")}
-          >
-            <UtensilsCrossed className="h-5 w-5" />
-            <span className="text-xs">Restaurants</span>
-          </Button>
-          <Button
-            variant={activeView === "orders" ? "default" : "ghost"}
-            size="sm"
-            className="flex-col h-auto py-2 gap-1"
-            onClick={() => setActiveView("orders")}
-          >
-            <Clock className="h-5 w-5" />
-            <span className="text-xs">Commandes</span>
-          </Button>
-          <Button
-            variant={activeView === "cart" ? "default" : "ghost"}
-            size="sm"
-            className="flex-col h-auto py-2 gap-1 relative"
-            onClick={() => setActiveView("cart")}
-          >
-            <ShoppingBag className="h-5 w-5" />
-            <span className="text-xs">Panier</span>
-            {cartItems.length > 0 && (
-              <span className="absolute top-1 right-2 bg-primary text-primary-foreground text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                {cartItems.length}
-              </span>
-            )}
-          </Button>
-          <Button
-            variant={activeView === "profile" ? "default" : "ghost"}
-            size="sm"
-            className="flex-col h-auto py-2 gap-1"
-            onClick={() => setActiveView("profile")}
-          >
-            <User className="h-5 w-5" />
-            <span className="text-xs">Profil</span>
-          </Button>
+      <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-xl border-t border-border safe-area-bottom z-50 lg:hidden">
+        <div className="flex items-center justify-around py-2">
+          {bottomNavItems.map((item) => (
+            <button
+              key={item.view}
+              onClick={() => setActiveView(item.view)}
+              className={cn(
+                "flex flex-col items-center justify-center py-2 px-4 transition-all duration-200",
+                activeView === item.view ? "text-primary" : "text-muted-foreground",
+              )}
+            >
+              {item.icon}
+              <span className="text-[10px] mt-1">{item.label}</span>
+            </button>
+          ))}
         </div>
       </nav>
     </div>

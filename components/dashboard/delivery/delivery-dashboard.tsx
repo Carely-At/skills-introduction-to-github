@@ -7,7 +7,6 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import {
   UtensilsCrossed,
-  LogOut,
   Package,
   Clock,
   User,
@@ -15,9 +14,12 @@ import {
   Home,
   Settings,
   Bell,
-  TrendingUp,
   Star,
   DollarSign,
+  MapPin,
+  Phone,
+  MessageSquare,
+  Bike,
 } from "lucide-react"
 import { signOut } from "@/lib/supabase/auth"
 import { useRouter } from "next/navigation"
@@ -25,15 +27,14 @@ import { createClient } from "@/lib/supabase/client"
 import { AvailableOrders } from "./available-orders"
 import { MyDeliveries } from "./my-deliveries"
 import { DeliveryHistory } from "./delivery-history"
-import { LocationTracker } from "./location-tracker"
 import { formatCurrency } from "@/lib/utils/currency"
 
 export function DeliveryDashboard() {
   const { userData } = useAuth()
   const router = useRouter()
-  const [activeView, setActiveView] = useState<"dashboard" | "available" | "active" | "history" | "profile">(
-    "dashboard",
-  )
+  const [activeView, setActiveView] = useState<
+    "dashboard" | "available" | "active" | "history" | "profile" | "planning"
+  >("dashboard")
   const [isAvailable, setIsAvailable] = useState((userData as any)?.isAvailable || false)
 
   const handleSignOut = async () => {
@@ -43,7 +44,6 @@ export function DeliveryDashboard() {
 
   const toggleAvailability = async () => {
     if (!userData?.uid) return
-
     try {
       const newStatus = !isAvailable
       const supabase = createClient()
@@ -51,164 +51,279 @@ export function DeliveryDashboard() {
         .from("delivery_profiles")
         .update({ is_available: newStatus })
         .eq("user_id", userData.uid)
-
       if (error) throw error
-
       setIsAvailable(newStatus)
     } catch (error) {
       console.error("Error updating availability:", error)
-      alert("Erreur lors de la mise à jour de la disponibilité")
     }
   }
+
+  const navItems = [
+    { id: "dashboard", label: "Tableau de bord", icon: Home },
+    { id: "available", label: "Revenus", icon: DollarSign },
+    { id: "planning", label: "Planning", icon: Clock },
+    { id: "active", label: "Paramètres", icon: Settings },
+  ]
 
   const renderDashboard = () => {
     return (
       <div className="space-y-6">
-        {/* Status Card */}
-        <div className="bg-gradient-to-br from-primary via-primary to-accent rounded-3xl p-8 text-primary-foreground shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              }}
-            />
-          </div>
-
-          <div className="relative z-10 flex items-center justify-between">
+        {/* Status Header */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/20 via-blue-600/10 to-transparent border border-blue-500/20 p-6">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Bienvenue, {userData?.firstName}</h2>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  {isAvailable ? (
-                    <>
-                      <div className="h-3 w-3 bg-green-400 rounded-full animate-pulse" />
-                      <span className="text-sm font-medium">Vous êtes EN LIGNE et recevez des commandes.</span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="h-3 w-3 bg-red-400 rounded-full" />
-                      <span className="text-sm font-medium">Vous êtes HORS LIGNE</span>
-                    </>
-                  )}
-                </div>
+              <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Bienvenue, {userData?.firstName}</h1>
+              <div className="flex items-center gap-2">
+                {isAvailable ? (
+                  <>
+                    <div className="h-2 w-2 bg-emerald-400 rounded-full animate-pulse" />
+                    <span className="text-sm text-emerald-400">Vous êtes EN LIGNE et recevez des commandes.</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="h-2 w-2 bg-red-400 rounded-full" />
+                    <span className="text-sm text-red-400">Vous êtes HORS LIGNE</span>
+                  </>
+                )}
               </div>
             </div>
-            <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl">
-              <Label htmlFor="availability-toggle" className="cursor-pointer font-medium">
-                {isAvailable ? "En ligne" : "Hors ligne"}
-              </Label>
-              <Switch id="availability-toggle" checked={isAvailable} onCheckedChange={toggleAvailability} />
-            </div>
+            <Button
+              variant="outline"
+              className="bg-blue-500/10 border-blue-500/30 text-blue-400 hover:bg-blue-500/20"
+              onClick={() => {}}
+            >
+              <MapPin className="h-4 w-4 mr-2" />
+              Voir la carte de chaleur
+            </Button>
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-card border border-border rounded-2xl p-6 hover:shadow-soft transition-smooth">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <DollarSign className="h-5 w-5 text-green-600" />
+          <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 hover:border-emerald-500/30 transition-all">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 rounded-lg bg-emerald-500/10">
+                <DollarSign className="h-5 w-5 text-emerald-400" />
               </div>
-              <span className="text-xs font-medium text-muted-foreground">Revenus du jour</span>
             </div>
-            <p className="text-2xl font-bold">{formatCurrency(84.5)}</p>
-            <p className="text-xs text-green-600 font-medium mt-1">+14%</p>
+            <p className="text-xs text-gray-500 mb-1">Revenus du jour</p>
+            <p className="text-2xl font-bold text-white">{formatCurrency(84.5)}</p>
+            <p className="text-xs text-emerald-400 mt-1">+12%</p>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-6 hover:shadow-soft transition-smooth">
-            <div className="flex items-center gap-3 mb-2">
+          <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 hover:border-blue-500/30 transition-all">
+            <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-blue-500/10">
-                <Package className="h-5 w-5 text-blue-600" />
+                <Package className="h-5 w-5 text-blue-400" />
               </div>
-              <span className="text-xs font-medium text-muted-foreground">Livraisons terminées</span>
             </div>
-            <p className="text-2xl font-bold">12</p>
-            <p className="text-xs text-blue-600 font-medium mt-1">+4</p>
+            <p className="text-xs text-gray-500 mb-1">Livraisons terminées</p>
+            <p className="text-2xl font-bold text-white">12</p>
+            <p className="text-xs text-blue-400 mt-1">+4</p>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-6 hover:shadow-soft transition-smooth">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Clock className="h-5 w-5 text-amber-600" />
+          <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 hover:border-orange-500/30 transition-all">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 rounded-lg bg-orange-500/10">
+                <Clock className="h-5 w-5 text-orange-400" />
               </div>
-              <span className="text-xs font-medium text-muted-foreground">Temps actif</span>
             </div>
-            <p className="text-2xl font-bold">3h 20m</p>
+            <p className="text-xs text-gray-500 mb-1">Temps actif</p>
+            <p className="text-2xl font-bold text-white">3h 20m</p>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-6 hover:shadow-soft transition-smooth">
-            <div className="flex items-center gap-3 mb-2">
+          <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 hover:border-purple-500/30 transition-all">
+            <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-purple-500/10">
-                <Star className="h-5 w-5 text-purple-600" />
+                <Star className="h-5 w-5 text-purple-400" />
               </div>
-              <span className="text-xs font-medium text-muted-foreground">Note livreur</span>
             </div>
-            <p className="text-2xl font-bold">4.9</p>
-            <p className="text-xs text-green-600 font-medium mt-1">+0.3</p>
+            <p className="text-xs text-gray-500 mb-1">Note livreur</p>
+            <p className="text-2xl font-bold text-white">4.9</p>
+            <p className="text-xs text-emerald-400 mt-1">+0.1</p>
           </div>
         </div>
 
-        {/* Location Tracker */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <h3 className="text-lg font-bold mb-4">Partage de localisation</h3>
-          <LocationTracker />
-        </div>
-
-        {/* Quick Actions */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <h3 className="text-lg font-bold mb-4">Actions Rapides</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <Button
-              variant="outline"
-              className="h-24 flex-col gap-2 bg-transparent"
-              onClick={() => setActiveView("available")}
-            >
-              <Package className="h-6 w-6" />
-              <span className="text-sm">Commandes disponibles</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-24 flex-col gap-2 bg-transparent"
-              onClick={() => setActiveView("active")}
-            >
-              <Clock className="h-6 w-6" />
-              <span className="text-sm">Mes livraisons</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-24 flex-col gap-2 bg-transparent"
-              onClick={() => setActiveView("history")}
-            >
-              <CheckCircle className="h-6 w-6" />
-              <span className="text-sm">Historique</span>
-            </Button>
-          </div>
-        </div>
-
-        {/* Earnings Chart */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold">Revenus de la semaine</h3>
-            <div className="flex items-center gap-2 text-sm text-green-600 font-medium">
-              <TrendingUp className="h-4 w-4" />
-              +18.5%
-            </div>
-          </div>
-          <div className="h-48 flex items-end gap-2">
-            {[65, 78, 82, 95, 88, 92, 105].map((value, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                <div
-                  className="w-full bg-primary/20 rounded-t-lg relative overflow-hidden"
-                  style={{ height: `${value}%` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary to-primary/50" />
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Current Task */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="bg-[#141414] border border-[#262626] rounded-xl overflow-hidden">
+              <div className="p-4 border-b border-[#262626] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-white">Tâche en cours</h3>
+                  <span className="text-xs text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full">
+                    15 min restantes
+                  </span>
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"][i]}
-                </span>
               </div>
-            ))}
+              <div className="p-4">
+                <div className="flex gap-4">
+                  {/* Map Preview */}
+                  <div className="w-32 h-32 rounded-xl bg-[#1a1a1a] border border-[#262626] overflow-hidden flex-shrink-0">
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500/10 to-emerald-500/10 flex items-center justify-center">
+                      <MapPin className="h-8 w-8 text-gray-600" />
+                    </div>
+                    <p className="text-xs text-gray-500 text-center -mt-6">1.9 km de la destination</p>
+                  </div>
+
+                  {/* Order Details */}
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full">
+                        EN COURS
+                      </span>
+                      <span className="text-xs text-gray-500">#3920</span>
+                    </div>
+                    <h4 className="font-semibold text-white mb-2">Burger King</h4>
+                    <div className="space-y-1 text-sm text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <Package className="h-4 w-4 text-gray-500" />
+                        <span>RETRAIT</span>
+                      </div>
+                      <p className="text-xs">Bâtiment Étudiant, Restauration</p>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-blue-400" />
+                        <span>LIVRAISON</span>
+                      </div>
+                      <p className="text-xs">Hall Nord, Salle 304</p>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">Articles: 2x Menu Whopper, 1x Grand Coca</p>
+                    <div className="flex items-center gap-2 mt-4">
+                      <Button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white">
+                        Mettre à jour le statut
+                      </Button>
+                      <Button variant="outline" size="icon" className="bg-transparent border-[#333]">
+                        <Phone className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" className="bg-transparent border-[#333]">
+                        <MessageSquare className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Incoming Requests */}
+            <div className="bg-[#141414] border border-[#262626] rounded-xl p-4">
+              <h3 className="font-semibold text-white mb-4">Demandes entrantes</h3>
+              <div className="space-y-3">
+                {[
+                  { name: "Panda Express", distance: "2.2 km", price: 6.5 },
+                  { name: "Starbucks", distance: "1.2 km", price: 4.25 },
+                ].map((request, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl border border-[#262626]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                        <Bike className="h-5 w-5 text-orange-400" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-white text-sm">{request.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {request.distance} - {formatCurrency(request.price)} est.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-transparent border-[#333] text-gray-400 hover:text-white"
+                      >
+                        Refuser
+                      </Button>
+                      <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white">
+                        Accepter
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-4">
+            {/* Recent Reviews */}
+            <div className="bg-[#141414] border border-[#262626] rounded-xl p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-white">Commentaires récents</h3>
+                <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300">
+                  Voir tout
+                </Button>
+              </div>
+              <div className="text-center py-4">
+                <div className="text-4xl font-bold text-white mb-1">4.9</div>
+                <div className="flex items-center justify-center gap-1 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500">Basé sur les 50 dernières livraisons</p>
+              </div>
+              <div className="space-y-3 mt-4">
+                {[
+                  {
+                    name: "Sarah M.",
+                    comment: '"Livraison super rapide et la nourriture était encore chaude ! Merci Alex."',
+                    tags: ["RAPIDE", "SYMPA"],
+                    time: "Il y a 3h",
+                  },
+                  { name: "Mike T.", comment: '"Instructions de livraison suivies à la lettre."', time: "1h+" },
+                ].map((review, i) => (
+                  <div key={i} className="p-3 bg-[#1a1a1a] rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-white text-sm">{review.name}</span>
+                      <span className="text-xs text-gray-500">{review.time}</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mb-2">{review.comment}</p>
+                    {review.tags && (
+                      <div className="flex gap-1">
+                        {review.tags.map((tag, j) => (
+                          <span key={j} className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Today's History */}
+            <div className="bg-[#141414] border border-[#262626] rounded-xl p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-white">Historique du jour</h3>
+              </div>
+              <div className="space-y-2">
+                {[
+                  { name: "Subway", time: "11h58", price: 8.5 },
+                  { name: "Taco Bell", time: "10h45", price: 6.25 },
+                  { name: "Chick-fil-A", time: "10h15", price: 9.0 },
+                  { name: "McDonald's", time: "09h30", price: 5.5 },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between py-2">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="h-4 w-4 text-emerald-400" />
+                      <div>
+                        <p className="text-sm font-medium text-white">{item.name}</p>
+                        <p className="text-xs text-gray-500">{item.time}</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium text-white">{formatCurrency(item.price)}</span>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" className="w-full mt-4 bg-transparent border-[#333] text-gray-400">
+                Voir l'historique complet
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -216,210 +331,143 @@ export function DeliveryDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card sticky top-0 z-50 safe-area-top">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between gap-4">
+    <div className="min-h-screen bg-[#0a0a0a]">
+      {/* Desktop Header */}
+      <header className="hidden lg:flex fixed top-0 left-0 right-0 z-50 bg-[#0f0f0f]/95 backdrop-blur-xl border-b border-[#1f1f1f]">
+        <div className="flex items-center justify-between w-full px-6 py-3">
+          <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-soft">
-                <UtensilsCrossed className="h-6 w-6 text-primary-foreground" />
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <UtensilsCrossed className="h-5 w-5 text-white" />
               </div>
-              <div>
-                <span className="text-xl font-bold hidden sm:block">CampusEats</span>
-                <span className="text-xs text-muted-foreground hidden sm:block">Portail Livreur</span>
-              </div>
+              <span className="font-bold text-white">CampusEats Livreur</span>
             </div>
-
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard/settings")}>
-                <User className="h-5 w-5" />
-              </Button>
+            <nav className="flex items-center gap-1">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveView(item.id as any)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeView === item.id || (item.id === "dashboard" && activeView === "dashboard")
+                      ? "text-blue-400 bg-blue-500/10"
+                      : "text-gray-400 hover:text-white hover:bg-[#1a1a1a]"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+          <div className="flex items-center gap-4">
+            {/* Availability Toggle */}
+            <div className="flex items-center gap-3 bg-[#141414] px-4 py-2 rounded-xl border border-[#262626]">
+              <Label htmlFor="avail" className="text-sm text-gray-400 cursor-pointer">
+                {isAvailable ? "En ligne" : "Hors ligne"}
+              </Label>
+              <Switch id="avail" checked={isAvailable} onCheckedChange={toggleAvailability} />
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-transparent border-[#333] text-gray-400"
+              onClick={handleSignOut}
+            >
+              Se déconnecter
+            </Button>
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+              {userData?.firstName?.charAt(0)}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Layout */}
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="hidden lg:flex lg:w-64 border-r border-border bg-card min-h-[calc(100vh-89px)] flex-col p-4">
-          <nav className="space-y-2 flex-1">
-            <Button
-              variant={activeView === "dashboard" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveView("dashboard")}
-            >
-              <Home className="h-4 w-4 mr-3" />
-              Tableau de Bord
-            </Button>
-            <Button
-              variant={activeView === "available" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveView("available")}
-            >
-              <Package className="h-4 w-4 mr-3" />
-              Commandes disponibles
-            </Button>
-            <Button
-              variant={activeView === "active" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveView("active")}
-            >
-              <Clock className="h-4 w-4 mr-3" />
-              Mes livraisons
-            </Button>
-            <Button
-              variant={activeView === "history" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveView("history")}
-            >
-              <CheckCircle className="h-4 w-4 mr-3" />
-              Historique
-            </Button>
-            <Button
-              variant={activeView === "profile" ? "default" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => setActiveView("profile")}
-            >
-              <User className="h-4 w-4 mr-3" />
-              Profil
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => router.push("/dashboard/settings")}>
-              <Settings className="h-4 w-4 mr-3" />
-              Paramètres
-            </Button>
-          </nav>
-
-          <div className="pt-4 border-t border-border mt-auto">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 mb-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold">
-                {userData?.firstName?.charAt(0)}
-                {userData?.lastName?.charAt(0)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate">
-                  {userData?.firstName} {userData?.lastName}
-                </p>
-                <p className="text-xs text-muted-foreground">Livreur</p>
-              </div>
+      {/* Mobile Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#0f0f0f]/95 backdrop-blur-xl border-b border-[#1f1f1f]">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <UtensilsCrossed className="h-5 w-5 text-white" />
             </div>
-            <Button variant="outline" className="w-full bg-transparent" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Se déconnecter
-            </Button>
+            <span className="font-bold text-white">CampusEats Livreur</span>
           </div>
-        </aside>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white relative">
+              <Bell className="h-5 w-5" />
+            </Button>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
+              {userData?.firstName?.charAt(0)}
+            </div>
+          </div>
+        </div>
+      </header>
 
-        {/* Main Content */}
-        <main className="flex-1 p-6 lg:p-8 safe-area-bottom">
+      {/* Main Content */}
+      <main className="min-h-screen pt-16 lg:pt-16 pb-20 lg:pb-8">
+        <div className="p-4 lg:p-8">
           {activeView === "dashboard" && renderDashboard()}
           {activeView === "available" && <AvailableOrders />}
           {activeView === "active" && <MyDeliveries />}
           {activeView === "history" && <DeliveryHistory />}
+          {activeView === "planning" && (
+            <div className="text-center py-20">
+              <Clock className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-white mb-2">Planning</h2>
+              <p className="text-gray-500">Bientôt disponible</p>
+            </div>
+          )}
           {activeView === "profile" && (
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold mb-6">Mon profil</h2>
-              <div className="bg-card p-6 rounded-2xl border border-border space-y-4">
+              <h2 className="text-2xl font-bold text-white mb-6">Mon profil</h2>
+              <div className="bg-[#141414] p-6 rounded-2xl border border-[#262626] space-y-4">
                 <Button
                   variant="outline"
-                  className="w-full bg-transparent"
+                  className="w-full bg-transparent border-[#333] text-white hover:bg-[#1a1a1a]"
                   onClick={() => router.push("/dashboard/settings")}
                 >
                   <User className="h-4 w-4 mr-2" />
-                  Gérer ma photo de profil et paramètres
+                  Paramètres du compte
                 </Button>
-
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Nom complet</label>
-                  <p className="text-lg">
+                  <label className="text-sm font-medium text-gray-500">Nom complet</label>
+                  <p className="text-lg text-white">
                     {userData?.firstName} {userData?.lastName}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Email</label>
-                  <p className="text-lg break-all">{userData?.email}</p>
+                  <label className="text-sm font-medium text-gray-500">Email</label>
+                  <p className="text-lg text-white break-all">{userData?.email}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">CampusID</label>
-                  <p className="text-lg font-mono">{userData?.campusId}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Téléphone</label>
-                  <p className="text-lg">{userData?.phone}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Type de véhicule</label>
-                  <p className="text-lg">{(userData as any)?.vehicleType || "Non défini"}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Statut</label>
-                  <p className="text-lg">
-                    {isAvailable ? (
-                      <span className="text-green-600 font-medium">Disponible</span>
-                    ) : (
-                      <span className="text-muted-foreground">Indisponible</span>
-                    )}
-                  </p>
+                  <label className="text-sm font-medium text-gray-500">CampusID</label>
+                  <p className="text-lg font-mono text-white">{userData?.campusId}</p>
                 </div>
               </div>
             </div>
           )}
-        </main>
-      </div>
+        </div>
+      </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border safe-area-bottom z-50">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#0f0f0f]/95 backdrop-blur-xl border-t border-[#1f1f1f] z-50">
         <div className="grid grid-cols-5 gap-1 p-2">
-          <Button
-            variant={activeView === "dashboard" ? "default" : "ghost"}
-            size="sm"
-            className="flex-col h-auto py-2 gap-1"
-            onClick={() => setActiveView("dashboard")}
-          >
-            <Home className="h-5 w-5" />
-            <span className="text-xs">Accueil</span>
-          </Button>
-          <Button
-            variant={activeView === "available" ? "default" : "ghost"}
-            size="sm"
-            className="flex-col h-auto py-2 gap-1"
-            onClick={() => setActiveView("available")}
-          >
-            <Package className="h-5 w-5" />
-            <span className="text-xs">Dispo</span>
-          </Button>
-          <Button
-            variant={activeView === "active" ? "default" : "ghost"}
-            size="sm"
-            className="flex-col h-auto py-2 gap-1"
-            onClick={() => setActiveView("active")}
-          >
-            <Clock className="h-5 w-5" />
-            <span className="text-xs">Actif</span>
-          </Button>
-          <Button
-            variant={activeView === "history" ? "default" : "ghost"}
-            size="sm"
-            className="flex-col h-auto py-2 gap-1"
-            onClick={() => setActiveView("history")}
-          >
-            <CheckCircle className="h-5 w-5" />
-            <span className="text-xs">Historique</span>
-          </Button>
-          <Button
-            variant={activeView === "profile" ? "default" : "ghost"}
-            size="sm"
-            className="flex-col h-auto py-2 gap-1"
-            onClick={() => setActiveView("profile")}
-          >
-            <User className="h-5 w-5" />
-            <span className="text-xs">Profil</span>
-          </Button>
+          {[
+            { id: "dashboard", icon: Home, label: "Accueil" },
+            { id: "available", icon: Package, label: "Dispo" },
+            { id: "active", icon: Clock, label: "Actif" },
+            { id: "history", icon: CheckCircle, label: "Historique" },
+            { id: "profile", icon: User, label: "Profil" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveView(item.id as any)}
+              className={`flex flex-col items-center gap-1 py-2 px-1 rounded-xl transition-all ${
+                activeView === item.id ? "text-blue-400 bg-blue-500/10" : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              <item.icon className="h-5 w-5" />
+              <span className="text-xs">{item.label}</span>
+            </button>
+          ))}
         </div>
       </nav>
     </div>
